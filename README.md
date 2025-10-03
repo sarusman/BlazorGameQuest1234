@@ -21,6 +21,16 @@
     * Gestion erreur authentification (Keycloak)
     * Page de configuration
 
+## Mise en place d’une Intégration Continue (CI)
+
+À chaque push, le pipeline exécute automatiquement :
+
+Build du projet
+
+Exécution des tests unitaires
+
+Analyse de la qualité du code via SonarCloud (maintenabilité, duplication, complexité, couverture de tests).
+
 ## Diagamme de cas d'utilisation
 
 ### Joueur
