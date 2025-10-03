@@ -1,0 +1,72 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+*.exe
+*.dll
+*.pdb
+*.cache
+*.log
+*.vspscc
+*.vssscc
+*.dbmdl
+*.bak
+*.Backup
+*.tmp
+*.temp
+*.log
+
+# Visual Studio
+.vs/
+.vscode/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# NuGet
+*.nupkg
+# NuGet packages folder
+packages/
+# Exclude build output of NuGet
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Dotnet
+project.lock.json
+project.fragment.lock.json
+
+# Entity Framework
+*_i.c
+*_p.c
+*_i.h
+*.db
+migrations/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Node.js (Blazor WebAssembly peut utiliser npm)
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn.lock
+package-lock.json
+
+# Blazor publish
+wwwroot/dist/
+wwwroot/.vs/
+wwwroot/lib/
+
+# Docker
+*.pid
+*.seed
+*.tar
+docker-compose.o
