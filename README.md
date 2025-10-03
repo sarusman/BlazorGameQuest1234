@@ -24,18 +24,18 @@
 ## Diagamme de cas d'utilisation
 
 ### Joueur
-<img src="image.png" alt="Diagramme Joueur" width="400"/>
+<img src=".github/images/image.png" alt="Diagramme Joueur" width="400"/>
 
 
 ### Admin (dev)
-<img src="image-1.png" alt="Diagramme Admin" width="400"/>
+<img src=".github/images/image-1.png" alt="Diagramme Admin" width="400"/>
 
 # Comment démarrer le projet
 
 ## 1. Cloner le dépôt
 git clone https://github.com/ton-compte/BlazorGameQuest1234.git
 cd BlazorGameQuest1234
-<img src="image-2.png" alt="Cloner dépôt" width="300"/>
+<img src=".github/images/image-2.png" alt="Cloner dépôt" width="300"/>
 
 ## 2. Restaurer les dépendances
 dotnet restore
@@ -47,14 +47,14 @@ dotnet build
 
 ### Lancer le client Blazor
 
-<img src="image-4.png" alt="Lancer client" width="300"/>
+<img src=".github/images/image-4.png" alt="Lancer client" width="300"/>
 cd BlazorGame.Client
 dotnet run
 ### Accessible sur : http://localhost:5000
 
 ### Lancer le service d’authentification
 
-<img src="image-5.png" alt="Lancer auth service" width="300"/>
+<img src=".github/images/image-5.png" alt="Lancer auth service" width="300"/>
 cd AuthenticationServices
 dotnet run
 ### Accessible sur : http://localhost:5001/api/auth
