@@ -20,3 +20,8 @@
     * Erreur 404
     * Gestion erreur authentification (Keycloak)
     * Page de configuration
+
+## Diagamme de cas d'utilisation
+
+### Joueur
+![alt text](image.png)
