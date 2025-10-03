@@ -1,4 +1,4 @@
-# SONAR 
+# DERNIÈRE ANALYSE SONAR 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sarusman_BlazorGameQuest1234&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=sarusman_BlazorGameQuest1234)
 
 # Version 1 - Cahier des charges
