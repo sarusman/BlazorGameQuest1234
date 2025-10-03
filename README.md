@@ -1,3 +1,6 @@
+# SONAR 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sarusman_BlazorGameQuest1234&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=sarusman_BlazorGameQuest1234)
+
 # Version 1 - Cahier des charges
 
 ## Identification de l’ensemble des pages pour le projet.
@@ -20,6 +23,16 @@
     * Erreur 404
     * Gestion erreur authentification (Keycloak)
     * Page de configuration
+
+## Mise en place d’une Intégration Continue (CI)
+
+À chaque push, le pipeline exécute automatiquement :
+
+Build du projet
+
+Exécution des tests unitaires
+
+Analyse de la qualité du code via SonarCloud (maintenabilité, duplication, complexité, couverture de tests).
 
 ## Diagamme de cas d'utilisation
 
