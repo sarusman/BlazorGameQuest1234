@@ -1,0 +1,66 @@
+@page "/new-adventure"
+
+<div class="game-rules">
+    <div class="rules-header">
+        <h1>Nouvelle Aventure</h1>
+        <p class="subtitle">Préparez-vous à explorer des donjons mystérieux !</p>
+    </div>
+
+    <div class="rules-content">
+        <h2>Règles du Jeu</h2>
+        
+        <div class="rule-section">
+            <h3>🎯 Objectif</h3>
+            <p>Vous incarnez un aventurier explorant des donjons générés aléatoirement. Votre mission : survivre le plus longtemps possible et accumuler un maximum de points !</p>
+        </div>
+
+        <div class="rule-section">
+            <h3>🏰 Exploration des Donjons</h3>
+            <ul>
+                <li>Chaque donjon contient un nombre aléatoire de salles (maximum 5)</li>
+                <li>Chaque salle a sa propre difficulté et ses défis uniques</li>
+                <li>Vous devrez faire des choix stratégiques dans chaque salle</li>
+            </ul>
+        </div>
+
+        <div class="rule-section">
+            <h3>⚔️ Choix dans chaque Salle</h3>
+            <div class="choices-explanation">
+                <div class="choice-card combat">
+                    <h4>🗡️ Combattre</h4>
+                    <p>Affrontez les ennemis pour gagner des points, mais attention au danger !</p>
+                </div>
+                <div class="choice-card search">
+                    <h4>🔍 Fouiller</h4>
+                    <p>Explorez la salle pour trouver des trésors ou des objets précieux.</p>
+                </div>
+                <div class="choice-card flee">
+                    <h4>🏃 Fuir</h4>
+                    <p>Échappez-vous en sécurité, mais vous gagnerez moins de points.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="rule-section">
+            <h3>💀 Fin de Partie</h3>
+            <p>Votre aventure se termine lorsque vous avez exploré toutes les salles du donjon ou si vous succombez aux dangers. Votre score final sera basé sur vos choix et votre survie !</p>
+        </div>
+
+        <div class="start-section">
+            <h3>Prêt à commencer votre aventure ?</h3>
+            <button class="btn btn-start" @onclick="StartAdventure">
+                🚀 Commencer l'Aventure
+            </button>
+        </div>
+    </div>
+</div>
+
+@inject NavigationManager Navigation
+
+@code {
+    private void StartAdventure()
+    {
+        // Redirection vers la page Salle pour commencer l'aventure
+        Navigation.NavigateTo("/salle");
+    }
+}

@@ -1,4 +1,4 @@
-# SONAR 
+# DERNIÈRE ANALYSE SONAR 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sarusman_BlazorGameQuest1234&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=sarusman_BlazorGameQuest1234)
 
 # Version 1 - Cahier des charges
@@ -28,11 +28,12 @@
 
 À chaque push, le pipeline exécute automatiquement :
 
-Build du projet
+https://github.com/sarusman/BlazorGameQuest1234/actions
+* Build du projet
 
-Exécution des tests unitaires
+* Exécution des tests unitaires
 
-Analyse de la qualité du code via SonarCloud (maintenabilité, duplication, complexité, couverture de tests).
+* Analyse de la qualité du code via SonarCloud (maintenabilité, duplication, complexité, couverture de tests).
 
 ## Diagamme de cas d'utilisation
 

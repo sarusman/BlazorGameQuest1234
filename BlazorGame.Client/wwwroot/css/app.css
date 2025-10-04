@@ -112,3 +112,11 @@ code {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* .accueil{
+    /* background-image: url('/images/homeBackground.png'); 
+    height: 100vh;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: white;
+} */

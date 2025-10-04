@@ -1,2 +1,77 @@
 @page "/history"
-<h3>Classement & Historique</h3>
+
+<TitleContent Title="Historique des parties">
+    <div class="history-container">
+        <div class="history-header">
+            <h2>Historique complet de vos aventures</h2>
+            <p>Retrouvez ici toutes vos parties jouées</p>
+        </div>
+
+        <div class="games-history">
+            @foreach (var game in allGames)
+            {
+                <div class="history-item">
+                    <div class="game-details">
+                        <div class="game-date">@game.Date</div>
+                        <div class="game-score">Score: @game.Score</div>
+                        <div class="game-duration">Durée: @game.Duration</div>
+                    </div>
+                    <div class="game-status @game.Status.ToLower()">
+                        @game.Status
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="history-stats">
+            <div class="stat-item">
+                <h4>Total des parties</h4>
+                <span>@allGames.Count</span>
+            </div>
+            <div class="stat-item">
+                <h4>Victoires</h4>
+                <span>@allGames.Count(g => g.Status == "Victoire")</span>
+            </div>
+            <div class="stat-item">
+                <h4>Meilleur score</h4>
+                <span>@allGames.Max(g => g.Score)</span>
+            </div>
+        </div>
+
+        <div class="back-button">
+            <button class="btn btn-secondary" @onclick="GoBack">
+                Retour à l'accueil
+            </button>
+        </div>
+    </div>
+</TitleContent>
+
+@inject NavigationManager Navigation
+
+@code {
+    // Historique complet des parties
+    private List<GameHistory> allGames = new()
+    {
+        new GameHistory { Date = "2024-01-15", Score = 1250, Status = "Victoire", Duration = "15 min" },
+        new GameHistory { Date = "2024-01-14", Score = 890, Status = "Défaite", Duration = "8 min" },
+        new GameHistory { Date = "2024-01-13", Score = 1100, Status = "Victoire", Duration = "12 min" },
+        new GameHistory { Date = "2024-01-12", Score = 750, Status = "Défaite", Duration = "6 min" },
+        new GameHistory { Date = "2024-01-11", Score = 980, Status = "Victoire", Duration = "14 min" },
+        new GameHistory { Date = "2024-01-10", Score = 650, Status = "Défaite", Duration = "5 min" },
+        new GameHistory { Date = "2024-01-09", Score = 1350, Status = "Victoire", Duration = "18 min" },
+        new GameHistory { Date = "2024-01-08", Score = 920, Status = "Victoire", Duration = "11 min" }
+    };
+    
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/");
+    }
+    
+    public class GameHistory
+    {
+        public string Date { get; set; } = "";
+        public int Score { get; set; }
+        public string Status { get; set; } = "";
+        public string Duration { get; set; } = "";
+    }
+}

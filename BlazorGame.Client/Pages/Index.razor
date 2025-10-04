@@ -1,2 +1,80 @@
 @page "/"
-<h3>Accueil / Connexion</h3>
+
+<div class="player-dashboard">
+    <div class="welcome-section">
+        <h2>Bienvenue, @playerName !</h2>
+        <div class="player-stats">
+            <div class="stat-card">
+                <h4>Meilleur Score</h4>
+                <span class="score">@bestScore</span>
+            </div>
+            <div class="stat-card">
+                <h4>Parties Jouées</h4>
+                <span class="count">@totalGames</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="recent-games">
+        <h3>Historique des 3 dernières parties</h3>
+        <div class="games-list">
+            @foreach (var game in recentGames)
+            {
+                <div class="game-item">
+                    <div class="game-info">
+                        <span class="game-date">@game.Date</span>
+                        <span class="game-score">Score: @game.Score</span>
+                    </div>
+                    <div class="game-status @game.Status.ToLower()">
+                        @game.Status
+                    </div>
+                </div>
+            }
+        </div>
+        <button class="btn btn-outline-primary" @onclick="GoToHistory">
+            Voir plus
+        </button>
+    </div>
+
+    <div class="action-buttons">
+        <button class="btn btn-primary btn-lg" @onclick="StartNewAdventure">
+            Nouvelle aventure
+        </button>
+    </div>
+</div>
+
+@inject NavigationManager Navigation
+
+@code {
+    // Données du joueur
+    private string playerName = "Aventurier";
+    private int bestScore = 1250;
+    private int totalGames = 8;
+    
+    // Historique des 3 dernières parties
+    private List<GameHistory> recentGames = new()
+    {
+        new GameHistory { Date = "2024-01-15", Score = 1250, Status = "Victoire" },
+        new GameHistory { Date = "2024-01-14", Score = 890, Status = "Défaite" },
+        new GameHistory { Date = "2024-01-13", Score = 1100, Status = "Victoire" }
+    };
+    
+    private void StartNewAdventure()
+    {
+        // Redirection vers la page NewAdventure
+        Navigation.NavigateTo("/new-adventure");
+    }
+    
+    private void GoToHistory()
+    {
+        // Redirection vers la page Historique
+        Navigation.NavigateTo("/history");
+    }
+    
+    public class GameHistory
+    {
+        public string Date { get; set; } = "";
+        public int Score { get; set; }
+        public string Status { get; set; } = "";
+    }
+}
