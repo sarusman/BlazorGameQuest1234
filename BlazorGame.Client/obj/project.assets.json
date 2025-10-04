@@ -1757,19 +1757,19 @@
     ]
   },
   "packageFolders": {
-    "/Users/sarusman/.nuget/packages/": {}
+    "/Users/godwin/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/sarusman/Desktop/ING-LSI/ING2/S1/DOTNET/BlazorGameQuest1234/BlazorGame.Client/BlazorGame.Client.csproj",
+      "projectUniqueName": "/Users/godwin/Documents/efrei/dotnet/PROJET/BlazorGameQuest1234/BlazorGame.Client/BlazorGame.Client.csproj",
       "projectName": "BlazorGame.Client",
-      "projectPath": "/Users/sarusman/Desktop/ING-LSI/ING2/S1/DOTNET/BlazorGameQuest1234/BlazorGame.Client/BlazorGame.Client.csproj",
-      "packagesPath": "/Users/sarusman/.nuget/packages/",
-      "outputPath": "/Users/sarusman/Desktop/ING-LSI/ING2/S1/DOTNET/BlazorGameQuest1234/BlazorGame.Client/obj/",
+      "projectPath": "/Users/godwin/Documents/efrei/dotnet/PROJET/BlazorGameQuest1234/BlazorGame.Client/BlazorGame.Client.csproj",
+      "packagesPath": "/Users/godwin/.nuget/packages/",
+      "outputPath": "/Users/godwin/Documents/efrei/dotnet/PROJET/BlazorGameQuest1234/BlazorGame.Client/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/sarusman/.nuget/NuGet/NuGet.Config"
+        "/Users/godwin/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
