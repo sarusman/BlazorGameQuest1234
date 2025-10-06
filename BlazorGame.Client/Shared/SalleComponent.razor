@@ -1,0 +1,58 @@
+<div class="adventure-scene">
+    <div class="scene-description">
+        <p class="scene-text">@SceneDescription</p>
+    </div>
+    
+    <div class="choices">
+        <h4>Que faites-vous ?</h4>
+        
+        <div class="choice-buttons">
+            <button class="btn btn-danger choice-btn" @onclick="Combattre">
+                @CombatChoice
+            </button>
+            
+            <button class="btn btn-warning choice-btn" @onclick="Fuir">
+                @FuiteChoice
+            </button>
+            
+            <button class="btn btn-info choice-btn" @onclick="Fouiller">
+                @FouilleChoice
+            </button>
+        </div>
+    </div>
+    
+    @if (!string.IsNullOrEmpty(resultMessage))
+    {
+        <div class="result-message">
+            <p>@resultMessage</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string SceneDescription { get; set; } = "";
+    [Parameter] public string CombatChoice { get; set; } = "";
+    [Parameter] public string FuiteChoice { get; set; } = "";
+    [Parameter] public string FouilleChoice { get; set; } = "";
+    [Parameter] public EventCallback<string> OnChoiceSelected { get; set; }
+    
+    private string resultMessage = "";
+    
+    private async Task Combattre()
+    {
+        resultMessage = "Vous engagez le combat ! Le détermine votre sort...";
+        await OnChoiceSelected.InvokeAsync("combat");
+    }
+    
+    private async Task Fuir()
+    {
+        resultMessage = "Vous prenez la fuite. Vous êtes en sécurité mais avez gagné moins de points.";
+        await OnChoiceSelected.InvokeAsync("fuite");
+    }
+    
+    private async Task Fouiller()
+    {
+        resultMessage = "Vous fouillez les environs... Vous pourriez trouver quelque chose d'intéressant !";
+        await OnChoiceSelected.InvokeAsync("fouille");
+    }
+}

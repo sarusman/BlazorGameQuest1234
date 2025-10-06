@@ -1,0 +1,25 @@
+@page "/salle"
+
+<TitleContent Title="Aventure en cours">
+    <SalleComponent 
+        SceneDescription="@sceneDescription"
+        CombatChoice="@combatChoice"
+        FuiteChoice="@fuiteChoice"
+        FouilleChoice="@fouilleChoice"
+        OnChoiceSelected="HandleChoiceSelected" />
+</TitleContent>
+
+@code {
+    // Variables pour les phrases - déclarées dans la page
+    private string sceneDescription = "Un gobelin apparaît. Que faites-vous ?";
+    private string combatChoice = "[Combattre] → Test de réussite, gain/perte de points";
+    private string fuiteChoice = "[Fuir] → Moins de points gagné, mais sécurité";
+    private string fouilleChoice = "[Fouiller] → Chance de trouver un objet précieux ou de tomber dans un piège";
+    
+    private void HandleChoiceSelected(string choice)
+    {
+        // Logique pour gérer le choix sélectionné
+        // Ici vous pouvez ajouter la logique métier selon le choix
+        Console.WriteLine($"Choix sélectionné : {choice}");
+    }
+}
