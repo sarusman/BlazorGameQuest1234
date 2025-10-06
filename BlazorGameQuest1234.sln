@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedModels", "SharedModel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorGame.Tests", "BlazorGame.Tests\BlazorGame.Tests.csproj", "{A4019DA5-2FC7-4CF8-A30D-5C9BE3F94C49}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorGame.Core", "BlazorGame.Core\BlazorGame.Core.csproj", "{A15E5FAB-CA7B-4058-BB3D-AAE309AD129F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,18 @@ Global
 		{A4019DA5-2FC7-4CF8-A30D-5C9BE3F94C49}.Release|x64.Build.0 = Release|Any CPU
 		{A4019DA5-2FC7-4CF8-A30D-5C9BE3F94C49}.Release|x86.ActiveCfg = Release|Any CPU
 		{A4019DA5-2FC7-4CF8-A30D-5C9BE3F94C49}.Release|x86.Build.0 = Release|Any CPU
+		{A15E5FAB-CA7B-4058-BB3D-AAE309AD129F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A15E5FAB-CA7B-4058-BB3D-AAE309AD129F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A15E5FAB-CA7B-4058-BB3D-AAE309AD129F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A15E5FAB-CA7B-4058-BB3D-AAE309AD129F}.Debug|x64.Build.0 = Debug|Any CPU
+		{A15E5FAB-CA7B-4058-BB3D-AAE309AD129F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A15E5FAB-CA7B-4058-BB3D-AAE309AD129F}.Debug|x86.Build.0 = Debug|Any CPU
+		{A15E5FAB-CA7B-4058-BB3D-AAE309AD129F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A15E5FAB-CA7B-4058-BB3D-AAE309AD129F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A15E5FAB-CA7B-4058-BB3D-AAE309AD129F}.Release|x64.ActiveCfg = Release|Any CPU
+		{A15E5FAB-CA7B-4058-BB3D-AAE309AD129F}.Release|x64.Build.0 = Release|Any CPU
+		{A15E5FAB-CA7B-4058-BB3D-AAE309AD129F}.Release|x86.ActiveCfg = Release|Any CPU
+		{A15E5FAB-CA7B-4058-BB3D-AAE309AD129F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
