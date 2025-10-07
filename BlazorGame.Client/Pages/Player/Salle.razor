@@ -1,13 +1,13 @@
 @page "/salle"
 
-<TitleContent Title="Aventure en cours">
-    <SalleComponent 
-        SceneDescription="@sceneDescription"
-        CombatChoice="@combatChoice"
-        FuiteChoice="@fuiteChoice"
-        FouilleChoice="@fouilleChoice"
-        OnChoiceSelected="HandleChoiceSelected" />
-</TitleContent>
+<h3>Aventure en cours</h3>
+
+<SalleComponent 
+    SceneDescription="@sceneDescription"
+    CombatChoice="@combatChoice"
+    FuiteChoice="@fuiteChoice"
+    FouilleChoice="@fouilleChoice"
+    OnChoiceSelected="HandleChoiceSelected" />
 
 @code {
     // Variables pour les phrases - déclarées dans la page
