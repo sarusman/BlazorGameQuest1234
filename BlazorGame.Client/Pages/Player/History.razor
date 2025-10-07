@@ -1,50 +1,50 @@
 @page "/history"
 
-<TitleContent Title="Historique des parties">
-    <div class="history-container">
-        <div class="history-header">
-            <h2>Historique complet de vos aventures</h2>
-            <p>Retrouvez ici toutes vos parties jouées</p>
-        </div>
+<h2>Historique des parties</h2>
 
-        <div class="games-history">
-            @foreach (var game in allGames)
-            {
-                <div class="history-item">
-                    <div class="game-details">
-                        <div class="game-date">@game.Date</div>
-                        <div class="game-score">Score: @game.Score</div>
-                        <div class="game-duration">Durée: @game.Duration</div>
-                    </div>
-                    <div class="game-status @game.Status.ToLower()">
-                        @game.Status
-                    </div>
+<div class="history-container">
+    <div class="history-header">
+        <h2>Historique complet de vos aventures</h2>
+        <p>Retrouvez ici toutes vos parties jouées</p>
+    </div>
+
+    <div class="games-history">
+        @foreach (var game in allGames)
+        {
+            <div class="history-item">
+                <div class="game-details">
+                    <div class="game-date">@game.Date</div>
+                    <div class="game-score">Score: @game.Score</div>
+                    <div class="game-duration">Durée: @game.Duration</div>
                 </div>
-            }
-        </div>
+                <div class="game-status @game.Status.ToLower()">
+                    @game.Status
+                </div>
+            </div>
+        }
+    </div>
 
-        <div class="history-stats">
-            <div class="stat-item">
-                <h4>Total des parties</h4>
-                <span>@allGames.Count</span>
-            </div>
-            <div class="stat-item">
-                <h4>Victoires</h4>
-                <span>@allGames.Count(g => g.Status == "Victoire")</span>
-            </div>
-            <div class="stat-item">
-                <h4>Meilleur score</h4>
-                <span>@allGames.Max(g => g.Score)</span>
-            </div>
+    <div class="history-stats">
+        <div class="stat-item">
+            <h4>Total des parties</h4>
+            <span>@allGames.Count</span>
         </div>
-
-        <div class="back-button">
-            <button class="btn btn-secondary" @onclick="GoBack">
-                Retour à l'accueil
-            </button>
+        <div class="stat-item">
+            <h4>Victoires</h4>
+            <span>@allGames.Count(g => g.Status == "Victoire")</span>
+        </div>
+        <div class="stat-item">
+            <h4>Meilleur score</h4>
+            <span>@allGames.Max(g => g.Score)</span>
         </div>
     </div>
-</TitleContent>
+
+    <div class="back-button">
+        <button class="btn btn-secondary" @onclick="GoBack">
+            Retour à l'accueil
+        </button>
+    </div>
+</div>
 
 @inject NavigationManager Navigation
 
