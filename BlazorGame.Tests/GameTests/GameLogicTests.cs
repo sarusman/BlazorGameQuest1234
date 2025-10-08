@@ -1,21 +1,19 @@
 namespace BlazorGame.Tests;
 
-
-public class GameLogicTests
+public class TestsJeu
 {
     [Fact]
-    public void Dungeon_ShouldContainBetween1And5Rooms()
+    public void Donjon_DoitAvoirEntre1Et5Salles()
     {
     }
 
     [Fact]
-    public void PlayerAction_Combat_ShouldAffectScore()
+    public void ActionJoueur_Combat_ModifieScore()
     {
     }
 
     [Fact]
-    public void PlayerAction_Flee_ShouldReducePoints()
+    public void ActionJoueur_Fuite_ReduitScore()
     {
     }
 }
-
