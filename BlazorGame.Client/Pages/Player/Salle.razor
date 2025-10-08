@@ -10,7 +10,6 @@
     OnChoiceSelected="HandleChoiceSelected" />
 
 @code {
-    // Variables pour les phrases - déclarées dans la page
     private string sceneDescription = "Un gobelin apparaît. Que faites-vous ?";
     private string combatChoice = "[Combattre] → Test de réussite, gain/perte de points";
     private string fuiteChoice = "[Fuir] → Moins de points gagné, mais sécurité";
@@ -18,8 +17,7 @@
     
     private void HandleChoiceSelected(string choice)
     {
-        // Logique pour gérer le choix sélectionné
-        // Ici vous pouvez ajouter la logique métier selon le choix
+        // Pour la v1 
         Console.WriteLine($"Choix sélectionné : {choice}");
     }
 }
