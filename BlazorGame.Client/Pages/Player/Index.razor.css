@@ -1,154 +1,111 @@
-.player-dashboard {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+.dashboard {
+    max-width: 700px;
+    margin: 40px auto;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    color: #333;
 }
 
-.welcome-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.welcome {
+    background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
-    padding: 30px;
+    padding: 25px;
     border-radius: 15px;
     margin-bottom: 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.welcome-section h2 {
+.welcome h2 {
+    margin-bottom: 10px;
+    font-size: 2rem;
+}
+
+.welcome p {
+    opacity: 0.9;
     margin-bottom: 20px;
-    font-size: 2.5rem;
-    font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.player-stats {
+.stats {
     display: flex;
+    justify-content: center;
     gap: 20px;
-    margin-top: 20px;
 }
 
-.stat-card {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 20px;
+.stats div {
+    background: rgba(255,255,255,0.15);
+    padding: 15px 25px;
     border-radius: 10px;
-    text-align: center;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
 }
 
-.stat-card h4 {
-    margin: 0 0 10px 0;
+.stats h4 {
+    margin-bottom: 5px;
     font-size: 1rem;
     opacity: 0.9;
 }
 
-.stat-card .score,
-.stat-card .count {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #fff;
+.stats span {
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 
-.recent-games {
+.recent {
     background: #f8f9fa;
-    padding: 25px;
-    border-radius: 15px;
+    padding: 20px;
+    border-radius: 10px;
     margin-bottom: 30px;
-    border: 2px solid #e9ecef;
 }
 
-.recent-games h3 {
+.recent h3 {
+    margin-bottom: 15px;
     color: #495057;
-    margin-bottom: 20px;
-    font-weight: 600;
 }
 
-.games-list {
-    margin-bottom: 20px;
-}
-
-.game-item {
+.game {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
     background: white;
-    border-radius: 10px;
+    border-left: 5px solid #667eea;
+    padding: 10px 15px;
+    border-radius: 8px;
     margin-bottom: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease;
 }
 
-.game-item:hover {
-    transform: translateY(-2px);
+.game.victoire { border-left-color: #28a745; }
+.game.défaite { border-left-color: #dc3545; }
+
+.status {
+    font-weight: bold;
 }
 
-.game-info {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+.actions {
+    margin-top: 20px;
 }
 
-.game-date {
-    font-weight: 600;
-    color: #495057;
-}
-
-.game-score {
-    color: #6c757d;
-    font-size: 0.9rem;
-}
-
-.game-status {
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.game-status.victoire {
-    background: #d4edda;
-    color: #155724;
-}
-
-.game-status.défaite {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-.action-buttons {
-    text-align: center;
-    margin-top: 30px;
-}
-
-.btn-lg {
-    padding: 15px 40px;
-    font-size: 1.2rem;
-    font-weight: 600;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #28a745, #20c997);
-    border: none;
+.btn {
+    background: #667eea;
     color: white;
-    transition: all 0.3s ease;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-.btn-lg:hover {
+.btn:hover {
+    background: #5a6edc;
+}
+
+.btn.start {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.btn.start:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
 }
 
 @media (max-width: 768px) {
-    .player-stats {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .welcome-section h2 {
-        font-size: 2rem;
-    }
-    
-    .game-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
+    .stats { flex-direction: column; }
+    .game { flex-direction: column; align-items: flex-start; }
 }
