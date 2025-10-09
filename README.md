@@ -3,6 +3,53 @@
 
 # Version 1 - Cahier des charges
 
+## Démmarrage VERSION 1
+`cd BlazorGame.Client`
+
+`dotnet build & dotnet run`
+
+# Structure du projet & Justification
+
+<img src=".github/images/image.png" alt="Lancer client" width="300"/>
+
+## AuthenticationServices
+
+Ce service gère l’authentification et la configuration avec Keycloak
+Il permet la connexion, la gestion des rôles (Admin / Joueur).
+
+## BlazorGame.Client
+
+Projet Blazor WebAssembly (le front-end du jeu).
+Il contient l’interface utilisateur, la page d’accueil, la navigation, et l’affichage des choix pendant l’aventure.
+
+## BlazorGame.Core
+La logique métier.
+On y gère la génération des donjons, les calculs de score, les actions possibles du joueur et les règles du jeu.
+
+## BlazorGame.GameServices
+
+Service Web API qui gère la partie “jeu” côté serveur.
+Il expose les endpoints pour les salles, les événements, et la progression des joueurs pendant une partie.
+
+## BlazorGame.PlayerServices
+
+Il s’occupe des profils, des scores, de l’historique des parties et du classement général.
+
+## SharedModels
+
+Bibliothèque partagée entre tous les projets.
+Elle contient les modèles, les DTOs, les énumérations et les objets utilisés.
+
+## BlazorGame.Tests
+
+Tous les tests du projet.
+
+BlazorGame.Tests.Core : tests unitaires de la logique métier.
+
+BlazorGame.Tests.API : tests d’intégration des services Web API.
+
+BlazorGame.Tests.Client : tests des composants Blazor UI.
+
 ## Identification de l’ensemble des pages pour le projet.
 
 - Pages Client

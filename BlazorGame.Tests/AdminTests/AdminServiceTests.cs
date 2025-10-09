@@ -1,1 +1,0 @@
-namespace BlazorGame.Tests;
