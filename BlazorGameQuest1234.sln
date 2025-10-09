@@ -15,12 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedModels", "SharedModel
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BlazorGame.Tests", "BlazorGame.Tests", "{CFE9EFC8-83CA-0309-07C6-9D90C087459F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorGame.Tests.API", "BlazorGame.Tests\BlazorGame.Tests.API\BlazorGame.Tests.API.csproj", "{6194DE5B-C415-4F77-9C6B-97DEC3222D36}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorGame.Tests.Client", "BlazorGame.Tests\BlazorGame.Tests.Client\BlazorGame.Tests.Client.csproj", "{50C85534-5045-441E-A10C-E1DFB4851552}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorGame.Tests.Core", "BlazorGame.Tests\BlazorGame.Tests.Core\BlazorGame.Tests.Core.csproj", "{66D69309-CFDD-4352-A1D7-BF98EC64C965}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
