@@ -44,11 +44,7 @@ Elle contient les modèles, les DTOs, les énumérations et les objets utilisés
 
 Tous les tests du projet.
 
-BlazorGame.Tests.Core : tests unitaires de la logique métier.
-
-BlazorGame.Tests.API : tests d’intégration des services Web API.
-
-BlazorGame.Tests.Client : tests des composants Blazor UI.
+BlazorGame.Tests.
 
 ## Identification de l’ensemble des pages pour le projet.
 
