@@ -4,7 +4,7 @@
     <h2>Historique des parties</h2>
     <p>Retrouvez ici toutes vos parties jouées</p>
 
-    @foreach (var game in allGames)
+    @foreach (GameHistory game in allGames)
     {
         <div class="game @game.Status.ToLower()">
             <div>
@@ -28,14 +28,14 @@
 @code {
     private List<GameHistory> allGames = new()
     {
-        new("2024-01-15", 1250, "Victoire", "15 min"),
-        new("2024-01-14", 890, "Défaite", "8 min"),
-        new("2024-01-13", 1100, "Victoire", "12 min"),
-        new("2024-01-12", 750, "Défaite", "6 min"),
-        new("2024-01-11", 980, "Victoire", "14 min"),
-        new("2024-01-10", 650, "Défaite", "5 min"),
-        new("2024-01-09", 1350, "Victoire", "18 min"),
-        new("2024-01-08", 920, "Victoire", "11 min")
+        new GameHistory("2024-01-15", 1250, "Victoire", "15 min"),
+        new GameHistory(Date: "2024-01-14", Score: 890, "Défaite", "8 min"),
+        new GameHistory(Date: "2024-01-13", Score: 1100, "Victoire", "12 min"),
+        new GameHistory(Date: "2024-01-12", Score: 750, "Défaite", "6 min"),
+        new GameHistory("2024-01-11", 980, "Victoire", "14 min"),
+        new GameHistory("2024-01-10", 650, "Défaite", "5 min"),
+        new GameHistory("2024-01-09", 1350, "Victoire", "18 min"),
+        new GameHistory("2024-01-08", 920, "Victoire", "11 min")
     };
 
     private void GoBack() => Navigation.NavigateTo("/");

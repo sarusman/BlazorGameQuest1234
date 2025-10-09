@@ -98,6 +98,7 @@ git clone https://github.com/ton-compte/BlazorGameQuest1234.git
 cd BlazorGameQuest1234
 <img src=".github/images/image-2.png" alt="Cloner dépôt" width="300"/>
 
+
 ## 2. Restaurer les dépendances
 dotnet restore
 
@@ -105,6 +106,12 @@ dotnet restore
 dotnet build
 
 ## 4. Lancer les projets
+
+## 5. Installer xUnit
+dotnet new install xunit.v3.templates
+cd BlazorGame.Tests/
+dotnet build
+dotnet test
 
 ### Lancer le client Blazor
 
