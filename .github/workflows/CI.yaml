@@ -1,0 +1,44 @@
+name: CI
+on:
+  push:
+    branches:
+      - develop
+      - master
+      - Prod
+  pull_request:
+    branches:
+      - develop
+
+
+jobs:
+  build-test-analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.305'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test --no-build --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=./TestResults/
+
+      - name: SonarCloud Scan
+        if: ${{ github.repository_owner == 'sarusman' }}
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=sarusman_BlazorGameQuest1234
+            -Dsonar.organization=sarusman
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.cs.opencover.reportsPaths=**/TestResults/coverage.opencover.xml
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
