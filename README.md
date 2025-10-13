@@ -42,9 +42,9 @@ Elle contient les modèles, les DTOs, les énumérations et les objets utilisés
 
 ## BlazorGame.Tests
 
-Tous les tests du projet.
+Tous les tests qu'on veut faire dans le projet sont dans le fichier
 
-BlazorGame.Tests.
+BlazorGame.Tests/UnitTest.cs
 
 ## Identification de l’ensemble des pages pour le projet.
 
