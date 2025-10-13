@@ -1,5 +1,11 @@
+
 # DERNIÈRE ANALYSE SONAR 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sarusman_BlazorGameQuest1234&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=sarusman_BlazorGameQuest1234)
+
+# NOM DES MEMEBRES DU BINOME
+Godwin KANLINSOU
+
+Sarusman SATKUNARAJAH SARUSMAN
 
 # Version 1 - Cahier des charges
 
@@ -42,9 +48,12 @@ Elle contient les modèles, les DTOs, les énumérations et les objets utilisés
 
 ## BlazorGame.Tests
 
-Tous les tests du projet.
+Tous les tests qu'on veut faire dans le projet sont dans le fichier
 
-BlazorGame.Tests.
+BlazorGame.Tests/UnitTest.cs
+
+lien Github:
+https://github.com/sarusman/BlazorGameQuest1234/blob/Prod/BlazorGame.Tests/UnitTest1.cs
 
 ## Identification de l’ensemble des pages pour le projet.
 
@@ -126,4 +135,3 @@ dotnet run
 ## 5. Urls d'utilisation
 - Joueur : http://localhost:5000
 - Admin : http://localhost:5000/admin
-
