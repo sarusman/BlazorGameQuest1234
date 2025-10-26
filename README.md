@@ -16,68 +16,7 @@ Sarusman SATKUNARAJAH SARUSMAN
 
 # Version 1 - Cahier des charges
 
-## Démmarrage VERSION 1
-`cd BlazorGame.Client`
-
-`dotnet build & dotnet run`
-## Fonctionnement du projet (idée + se qui est mit en place)
-
-<img width="1600" height="1243" alt="hLZDRjj64BxhAHRA8R9XMxOJfqxX6gKeob6YlufoWYBEOIMkPJhKhhfSsb427me41GeKRT6aADgBUsgYOs_jfHUzILwWVeJExbBIIgJi01LjsDHmvfl_cQK-3mNc8ke56U6BWA2hov___lUl7z3gQY70Bna_m3s2rb4fY5uWxpRkzqc0SXNI4H4dA8z6ttQuB-zNLbSpcV2vJ_kOunvguyxpBcSHzM" src="https://github.com/user-attachments/assets/7cacad25-c42a-4897-b96f-cd9d65112d44" />
-
-
-## Structure du projet & Justification
-
-<img src=".github/images/image.png" alt="Lancer client" width="300"/>
-
-## AuthenticationServices
-
-Ce service gère l’authentification et la configuration avec Keycloak
-Il permet la connexion, la gestion des rôles (Admin / Joueur).
-
-## BlazorGame.Client
-
-Projet Blazor WebAssembly (le front-end du jeu).
-Il contient l’interface utilisateur, la page d’accueil, la navigation, et l’affichage des choix pendant l’aventure.
-
-## BlazorGame.GameServices
-
-Service Web API qui gère la partie “jeu” côté serveur.
-Il expose les endpoints pour les salles, les événements, et la progression des joueurs pendant une partie.
-
-## SharedModels
-
-Bibliothèque partagée entre tous les projets.
-Elle contient les modèles, les DTOs, les énumérations et les objets utilisés.
-
-## BlazorGame.Tests
-
-Tous les tests qu'on veut faire dans le projet sont dans le fichier
-
-BlazorGame.Tests/UnitTest.cs
-
-lien Github:
-https://github.com/sarusman/BlazorGameQuest1234/blob/Prod/BlazorGame.Tests/UnitTest1.cs
-
-## Identification de l’ensemble des pages pour le projet.
-
-- Pages Client
-
-    * Page d’accueil / Connexion
-    * Tableau de bord joueur
-    * Interface de jeu
-    * Fin de partie
-    * Classement / Historique personnel
-
-- Pages Administrateur
-
-    * Tableau de bord Admin
-    * Historique global
-
-- Pages d’erreur
-
-    * Erreur 404
-    * Gestion erreur authentification (Keycloak)
-    * Page de configuration
+https://github.com/sarusman/BlazorGameQuest1234/tree/V1
 
 ## Mise en place d’une Intégration Continue (CI)
 
@@ -116,8 +55,6 @@ dotnet build
 ## 4. Lancer les projets
 
 ## 5. Installer xUnit
-dotnet new install xunit.v3.templates
-cd BlazorGame.Tests/
 dotnet build
 dotnet test
 
