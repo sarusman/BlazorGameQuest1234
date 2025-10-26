@@ -7,14 +7,25 @@ Godwin KANLINSOU
 
 Sarusman SATKUNARAJAH SARUSMAN
 
+# Version 2 - Cahier des charges
+
+## Démmarrage VERSION 2
+`dotnet build`
+`cd BlazorGame.Client`
+`dotnet run`
+
 # Version 1 - Cahier des charges
 
 ## Démmarrage VERSION 1
 `cd BlazorGame.Client`
 
 `dotnet build & dotnet run`
+## Fonctionnement du projet (idée + se qui est mit en place)
 
-# Structure du projet & Justification
+<img width="1600" height="1243" alt="hLZDRjj64BxhAHRA8R9XMxOJfqxX6gKeob6YlufoWYBEOIMkPJhKhhfSsb427me41GeKRT6aADgBUsgYOs_jfHUzILwWVeJExbBIIgJi01LjsDHmvfl_cQK-3mNc8ke56U6BWA2hov___lUl7z3gQY70Bna_m3s2rb4fY5uWxpRkzqc0SXNI4H4dA8z6ttQuB-zNLbSpcV2vJ_kOunvguyxpBcSHzM" src="https://github.com/user-attachments/assets/7cacad25-c42a-4897-b96f-cd9d65112d44" />
+
+
+## Structure du projet & Justification
 
 <img src=".github/images/image.png" alt="Lancer client" width="300"/>
 
