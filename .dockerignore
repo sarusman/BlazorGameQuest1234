@@ -1,0 +1,8 @@
+bin/
+obj/
+.vscode/
+.git/
+.github/
+*.user
+*.suo
+*.csproj.user

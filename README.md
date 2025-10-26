@@ -28,18 +28,10 @@ Il permet la connexion, la gestion des rôles (Admin / Joueur).
 Projet Blazor WebAssembly (le front-end du jeu).
 Il contient l’interface utilisateur, la page d’accueil, la navigation, et l’affichage des choix pendant l’aventure.
 
-## BlazorGame.Core
-La logique métier.
-On y gère la génération des donjons, les calculs de score, les actions possibles du joueur et les règles du jeu.
-
 ## BlazorGame.GameServices
 
 Service Web API qui gère la partie “jeu” côté serveur.
 Il expose les endpoints pour les salles, les événements, et la progression des joueurs pendant une partie.
-
-## BlazorGame.PlayerServices
-
-Il s’occupe des profils, des scores, de l’historique des parties et du classement général.
 
 ## SharedModels
 
