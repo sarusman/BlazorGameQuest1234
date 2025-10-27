@@ -1,0 +1,78 @@
+@page "/connexion"
+
+@inject HttpClient Http
+
+<h2>Se connecter</h2>
+
+@if (!string.IsNullOrWhiteSpace(SuccessMessage))
+{
+    <div style="color: green">@SuccessMessage</div>
+}
+@if (!string.IsNullOrWhiteSpace(ErrorMessage))
+{
+    <div style="color: red">@ErrorMessage</div>
+}
+
+<div style="display:flex;flex-direction:column;gap:0.5rem;max-width:300px">
+    <label>
+        Pseudo
+        <input @bind="Pseudo" />
+    </label>
+
+    <button @onclick="LoginAsync">Connexion</button>
+</div>
+
+@code {
+    private string Pseudo = string.Empty;
+
+    private string SuccessMessage = string.Empty;
+    private string ErrorMessage = string.Empty;
+
+    /// <summary>
+    /// Appelle POST /api/joueurs/login pour retrouver le joueur existant selon son pseudo.
+    /// </summary>
+    private async Task LoginAsync()
+    {
+        SuccessMessage = string.Empty;
+        ErrorMessage = string.Empty;
+
+        var body = new
+        {
+            pseudo = Pseudo
+        };
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("/api/joueurs/login", body);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // backend renvoie le Joueur trouvé
+                var joueur = await response.Content.ReadFromJsonAsync<JoueurResponse>();
+
+                SuccessMessage = $"Connecté: {joueur?.Pseudo} (Id: {joueur?.Id})";
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                ErrorMessage = "Joueur introuvable";
+            }
+            else
+            {
+                ErrorMessage = $"Erreur API ({(int)response.StatusCode})";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Erreur client: {ex.Message}";
+        }
+    }
+
+    /// <summary>
+    /// Le format du joueur renvoyé par l'API sur /login.
+    /// </summary>
+    private class JoueurResponse
+    {
+        public Guid Id { get; set; }
+        public string Pseudo { get; set; } = string.Empty;
+    }
+}

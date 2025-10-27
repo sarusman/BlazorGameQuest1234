@@ -1,59 +1,30 @@
 @page "/"
 
-<div class="dashboard">
-    <div class="welcome">
-        <h2>Salut, @playerName</h2>
-        <p>Voici un petit aperçu de ton aventure :</p>
+<div class="home-container">
+    <div class="background-slider">
+        <div class="bg-slide bg-slide-1"></div>
+        <div class="bg-slide bg-slide-2"></div>
+        <div class="bg-slide bg-slide-3"></div>
+    </div>
 
-        <div class="stats">
-            <div>
-                <h4>Meilleur score</h4>
-                <span>@bestScore</span>
-            </div>
-            <div>
-                <h4>Parties jouées</h4>
-                <span>@totalGames</span>
-            </div>
+    <div class="content-overlay">
+        <div class="hero-section">
+            <button class="btn-play" @onclick="StartAdventure">Jouer</button>
         </div>
     </div>
 
-    <div class="recent">
-        <h3>Dernières parties</h3>
-
-        @foreach (var game in recentGames)
-        {
-            <div class="game @game.Status.ToLower()">
-                <div>
-                    <strong>@game.Date</strong> — Score : @game.Score
-                </div>
-                <span class="status">@game.Status</span>
-            </div>
-        }
-
-        <button class="btn" @onclick="GoToHistory">Voir tout l’historique</button>
-    </div>
-
-    <div class="actions">
-        <button class="btn start" @onclick="StartNewAdventure">Commencer une nouvelle aventure ⚔️</button>
-    </div>
+    <nav class="bottom-nav">
+        <a href="/inscription" class="nav-link">Créer un utilisateur</a>
+        <a href="/connexion" class="nav-link">Se connecter</a>
+        <a href="/history" class="nav-link">Classement</a>
+    </nav>
 </div>
 
 @inject NavigationManager Navigation
 
 @code {
-    private string playerName = "Aventurier";
-    private int bestScore = 1250;
-    private int totalGames = 8;
-
-    private List<Game> recentGames = new()
+    private void StartAdventure()
     {
-        new("2024-01-15", 1250, "Victoire"),
-        new("2024-01-14", 890, "Défaite"),
-        new("2024-01-13", 1100, "Victoire")
-    };
-
-    private void StartNewAdventure() => Navigation.NavigateTo("/new-adventure");
-    private void GoToHistory() => Navigation.NavigateTo("/history");
-
-    public record Game(string Date, int Score, string Status);
+        Navigation.NavigateTo("/new-adventure");
+    }
 }
