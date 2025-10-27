@@ -12,6 +12,18 @@ builder.Services.AddDbContext<GameDbContext>(options =>
 builder.Services.AddScoped(typeof(Repository<>));
 builder.Services.AddScoped<GameplayService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowClient",
+        policy =>
+        {
+            policy
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -24,6 +36,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+app.UseCors("AllowClient");
 
 if (app.Environment.IsDevelopment())
 {

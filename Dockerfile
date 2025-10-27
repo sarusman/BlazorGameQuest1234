@@ -1,36 +1,38 @@
-# Build stage
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-WORKDIR /src
+# Étape 1: Utiliser le SDK .NET 9
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS base
+WORKDIR /source
 
-# Copy project files
-COPY ["BlazorGame.Client/BlazorGame.Client.csproj", "BlazorGame.Client/"]
-COPY ["BlazorGame.Core/BlazorGame.Core.csproj", "BlazorGame.Core/"]
-COPY ["SharedModels/SharedModels.csproj", "SharedModels/"]
+# Copier les fichiers projet et restaurer les paquets
+COPY BlazorGameQuest1234.sln .
+COPY AuthenticationServices/AuthenticationServices.csproj AuthenticationServices/
+COPY BlazorGame.Client/BlazorGame.Client.csproj BlazorGame.Client/
+COPY BlazorGame.GameService/BlazorGame.GameService.csproj BlazorGame.GameService/
+COPY BlazorGame.Tests/BlazorGame.Tests.csproj BlazorGame.Tests/
+COPY SharedModels/SharedModels.csproj SharedModels/
+RUN dotnet restore BlazorGameQuest1234.sln
 
-# Restore dependencies
-RUN dotnet restore "BlazorGame.Client/BlazorGame.Client.csproj"
-
-# Copy remaining source code
+# Copier le reste du code source
 COPY . .
 
-# Publish the WebAssembly app
-RUN dotnet publish "BlazorGame.Client/BlazorGame.Client.csproj" -c Release -o /app/publish
+# Étape 2: Construire le GameService
+FROM base AS build-gameservice
+WORKDIR /source/BlazorGame.GameService
+RUN dotnet publish -c Release -o /app/publish
 
-# Runtime stage - use nginx to serve static files
-FROM nginx:stable-alpine
+# Étape 3: Construire le Client
+FROM base AS build-client
+WORKDIR /source/BlazorGame.Client
+RUN dotnet publish -c Release -o /app/publish
 
-# Remove default config
-RUN rm -rf /etc/nginx/conf.d/default.conf
 
-# Copy published Blazor WebAssembly files to nginx root
-COPY --from=build /app/publish/wwwroot /usr/share/nginx/html
+# --- Images Finales ---
 
-# Fix permissions - very permissive for now
-RUN chmod -R 777 /usr/share/nginx/html && \
-    find /usr/share/nginx/html -type f -exec chmod 644 {} \; && \
-    find /usr/share/nginx/html -type d -exec chmod 755 {} \;
+# Image finale pour GameService avec le runtime .NET 9
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS gameservice
+WORKDIR /app
+COPY --from=build-gameservice /app/publish .
+ENTRYPOINT ["dotnet", "BlazorGame.GameService.dll"]
 
-# Copy custom nginx config template
-COPY default.conf.template /etc/nginx/templates/default.conf.template
-
-EXPOSE 5050
+# Image finale pour le Client (servi par Nginx)
+FROM nginx:alpine AS client
+COPY --from=build-client /app/publish/wwwroot /usr/share/nginx/html

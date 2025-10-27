@@ -14,14 +14,17 @@
     </div>
 
     <nav class="bottom-nav">
-        <a href="/creer-utilisateur" class="nav-link">Créer un utilisateur</a>
-        <a href="/se-connecter" class="nav-link">Se connecter</a>
-        <a href="/informations" class="nav-link">Informations</a>
+        <a href="/inscription" class="nav-link">Créer un utilisateur</a>
+        <a href="/connexion" class="nav-link">Se connecter</a>
+        <a href="/history" class="nav-link">Classement</a>
     </nav>
 </div>
 
 @inject NavigationManager Navigation
 
 @code {
-    private void StartAdventure() => Navigation.NavigateTo("/dashboard");
+    private void StartAdventure()
+    {
+        Navigation.NavigateTo("/new-adventure");
+    }
 }

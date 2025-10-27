@@ -5,7 +5,7 @@ using SharedModels.Domain.Users;
 namespace BlazorGame.GameService.Controllers
 {
     /// <summary>
-    /// Endpoints joueurs : création de joueur, login simulé, récupération d'un joueur.
+    /// Endpoints liés aux joueurs (inscription, login, info).
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
@@ -16,18 +16,18 @@ namespace BlazorGame.GameService.Controllers
         /// <summary>
         /// Construit le contrôleur joueur.
         /// </summary>
-        /// <param name="joueurRepo">Repository pour l'entité Joueur.</param>
+        /// <param name="joueurRepo">Repository pour Joueur.</param>
         public JoueursController(Repository<Joueur> joueurRepo)
         {
             _joueurRepo = joueurRepo;
         }
 
         /// <summary>
-        /// Crée un nouveau joueur (inscription / enregistrement initial).
+        /// Inscrit un nouveau joueur.
         /// </summary>
-        /// <param name="request">Pseudo, compte Keycloak et état Actif.</param>
+        /// <param name="request">Données d'inscription (pseudo, email).</param>
         /// <param name="ct">Token d'annulation.</param>
-        /// <returns>Le joueur créé en base.</returns>
+        /// <returns>Le joueur créé.</returns>
         [HttpPost("register")]
         public async Task<ActionResult<Joueur>> Register([FromBody] RegisterRequest request, CancellationToken ct)
         {
@@ -35,8 +35,6 @@ namespace BlazorGame.GameService.Controllers
             {
                 Id = Guid.NewGuid(),
                 Pseudo = request.Pseudo,
-                KeycloakUserName = request.KeycloakUserName,
-                Actif = request.Actif
             };
 
             await _joueurRepo.AddAsync(joueur, ct);
@@ -44,31 +42,27 @@ namespace BlazorGame.GameService.Controllers
         }
 
         /// <summary>
-        /// Simule la connexion d'un joueur via son identifiant Keycloak.
+        /// Simule la connexion d'un joueur par pseudo.
         /// </summary>
-        /// <param name="request">Identifiant Keycloak envoyé par le client.</param>
+        /// <param name="request">Pseudo du joueur qui veut se connecter.</param>
         /// <param name="ct">Token d'annulation.</param>
-        /// <returns>Le joueur correspondant si trouvé, sinon 404.</returns>
+        /// <returns>Le joueur si trouvé, sinon 404.</returns>
         [HttpPost("login")]
         public async Task<ActionResult<Joueur>> Login([FromBody] LoginRequest request, CancellationToken ct)
         {
             var all = await _joueurRepo.ListAsync(ct);
-
-            var joueur = all.FirstOrDefault(j =>
-                j.KeycloakUserName == request.KeycloakUserName &&
-                j.Actif
-            );
+            var joueur = all.FirstOrDefault(j => j.Pseudo == request.Pseudo);
 
             if (joueur == null)
-                return NotFound("Joueur introuvable ou inactif");
+                return NotFound("Joueur introuvable");
 
             return Ok(joueur);
         }
 
         /// <summary>
-        /// Récupère les infos d'un joueur via son Id.
+        /// Retourne les infos d'un joueur.
         /// </summary>
-        /// <param name="id">Id du joueur (GUID).</param>
+        /// <param name="id">Id du joueur.</param>
         /// <param name="ct">Token d'annulation.</param>
         /// <returns>Le joueur si trouvé, sinon 404.</returns>
         [HttpGet("{id:guid}")]
@@ -82,27 +76,25 @@ namespace BlazorGame.GameService.Controllers
         }
 
         /// <summary>
-        /// Modèle d'inscription d'un joueur.
+        /// Modèle pour l'inscription.
         /// </summary>
         public class RegisterRequest
         {
-            /// <summary>Pseudo public affiché en jeu.</summary>
+            /// <summary>Le pseudo choisi par le joueur.</summary>
             public string Pseudo { get; set; } = string.Empty;
-
-            /// <summary>Nom d'utilisateur Keycloak lié à ce joueur.</summary>
-            public string KeycloakUserName { get; set; } = string.Empty;
-
-            /// <summary>Statut actif / banni.</summary>
-            public bool Actif { get; set; } = true;
+            /// <summary>Email du joueur.</summary>
+            public string Email { get; set; } = string.Empty;
         }
 
         /// <summary>
-        /// Modèle de login joueur.
+        /// Modèle pour la connexion.
         /// </summary>
         public class LoginRequest
         {
-            /// <summary>Identifiant Keycloak du joueur courant.</summary>
-            public string KeycloakUserName { get; set; } = string.Empty;
+            /// <summary>Pseudo du joueur.</summary>
+            public string Pseudo { get; set; } = string.Empty;
         }
     }
 }
+
+

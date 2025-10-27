@@ -3,19 +3,25 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sarusman_BlazorGameQuest1234&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=sarusman_BlazorGameQuest1234)
 
 # NOM DES MEMEBRES DU BINOME
-Godwin KANLINSOU
+Juphil Godwin KANLINSOU
 
-Sarusman SATKUNARAJAH SARUSMAN
+Sarusman SATKUNARAJAH
 
 # Version 2 - Cahier des charges
 
-## Démmarrage VERSION 2
-`dotnet build`
-`cd BlazorGame.GameService`
-`dotnet run`
+## Démarrage VERSION 2
+
+`docker compose up --build` <br>
+
+## URLS : 
+- UI (Gateway) : http://localhost:5000
+- Backend swagger (Serveur) : http://localhost:8080/swagger/index.html
 
 <img width="1600" height="1243" alt="hLZDRjj64BxhAHRA8R9XMxOJfqxX6gKeob6YlufoWYBEOIMkPJhKhhfSsb427me41GeKRT6aADgBUsgYOs_jfHUzILwWVeJExbBIIgJi01LjsDHmvfl_cQK-3mNc8ke56U6BWA2hov___lUl7z3gQY70Bna_m3s2rb4fY5uWxpRkzqc0SXNI4H4dA8z6ttQuB-zNLbSpcV2vJ_kOunvguyxpBcSHzM" src="https://github.com/user-attachments/assets/cc60276c-d95c-4d55-8752-a0af412e07d8" />
 
+## Test VERSION 2
+
+`dotnet test`
 
 # Version 1 - Cahier des charges
 
@@ -52,29 +58,5 @@ cd BlazorGameQuest1234
 ## 2. Restaurer les dépendances
 dotnet restore
 
-## 3. Compiler la solution
+## 3. Builder le projet
 dotnet build
-
-## 4. Lancer les projets
-
-## 5. Installer xUnit
-dotnet build
-dotnet test
-
-### Lancer le client Blazor
-
-<img src=".github/images/image-4.png" alt="Lancer client" width="300"/>
-cd BlazorGame.Client
-dotnet run
-### Accessible sur : http://localhost:5000
-
-### Lancer le service d’authentification
-
-<img src=".github/images/image-5.png" alt="Lancer auth service" width="300"/>
-cd AuthenticationServices
-dotnet run
-### Accessible sur : http://localhost:5001/api/auth
-
-## 5. Urls d'utilisation
-- Joueur : http://localhost:5000
-- Admin : http://localhost:5000/admin
