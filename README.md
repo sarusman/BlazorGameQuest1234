@@ -50,7 +50,7 @@ https://github.com/sarusman/BlazorGameQuest1234/actions
 # Comment démarrer le projet
 
 ## 1. Cloner le dépôt
-git clone https://github.com/ton-compte/BlazorGameQuest1234.git
+git clone https://github.com/sarusman/BlazorGameQuest1234.git
 cd BlazorGameQuest1234
 <img src=".github/images/image-2.png" alt="Cloner dépôt" width="300"/>
 
