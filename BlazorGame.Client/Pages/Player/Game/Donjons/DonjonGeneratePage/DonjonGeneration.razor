@@ -1,0 +1,60 @@
+@page "/donjonGenerator"
+@using System.Net.Http.Json
+@using SharedModels.Domain.Common
+@using SharedModels.Domain.Gameplay
+@using SharedModels.Domain.Sealed
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<div class="generator-container">
+    <div class="loading-box">
+        <div class="spinner"></div>
+        <h1>Génération du donjon…</h1>
+        <p>Prépare toi à l'aventure</p>
+    </div>
+</div>
+
+@code {
+    [Parameter, SupplyParameterFromQuery(Name = "level")]
+    public int? Level { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var diff = Level switch
+        {
+            1 => Difficulte.Facile,
+            3 => Difficulte.Difficile,
+            _ => Difficulte.Normal
+        };
+
+        var nbSalle = Level switch
+        {
+            1 => 2,
+            2 => 3,
+            3 => 5
+        };
+
+        var body = new CreateDonjonRequest
+        {
+            Nom = "Donjon",
+            Difficulte = diff,
+            NbSalles = nbSalle
+        };
+
+        var res = await Http.PostAsJsonAsync("/api/donjons", body);
+        if (!res.IsSuccessStatusCode)
+        {
+            Nav.NavigateTo("/");
+            return;
+        }
+
+        var donjon = await res.Content.ReadFromJsonAsync<Donjon>();
+        if (donjon is null)
+        {
+            Nav.NavigateTo("/");
+            return;
+        }
+
+        Nav.NavigateTo($"/donjon/{donjon.Id}", forceLoad: true);
+    }
+}

@@ -4,7 +4,7 @@ namespace SharedModels.Domain.Common
     public record Points(int Valeur);
 
     /// <summary>Niveau de difficulté.</summary>
-    public enum Difficulte { Facile = 1, Normal = 2, Difficile = 3, Mortel = 4 }
+    public enum Difficulte { Facile = 1, Normal = 2, Difficile = 3}
 
     /// <summary>Type de salle.</summary>
     public enum TypeSalle { Combat, Coffre, Piege, Rencontre, Enigme, Repos }

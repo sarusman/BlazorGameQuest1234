@@ -1,0 +1,115 @@
+@page "/donjon/{id:guid}"
+@using System.Net.Http.Json
+@using SharedModels.Domain.Gameplay
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject BlazorGame.Client.Services.GameState State
+
+<link rel="stylesheet" href="css/donjon.css">
+
+<div class="donjon-container">
+    <video autoplay muted loop class="background-video">
+        <source src="/videos/InsideDonjon.mp4" type="video/mp4">
+    </video>
+
+    <div class="donjon-content">
+        @if (!string.IsNullOrWhiteSpace(Error))
+        {
+            <div class="error-message">@Error</div>
+        }
+
+        @if (Loading)
+        {
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Chargement du donjon…</p>
+            </div>
+        }
+        else if (DonjonData is null)
+        {
+            <div class="error-message">Donjon introuvable.</div>
+        }
+        else
+        {
+            <div class="donjon-info">
+                <h1 class="donjon-title">@DonjonData.Nom</h1>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <span class="stat-label">Difficulté</span>
+                        <span class="stat-value">@DonjonData.Difficulte</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Salles</span>
+                        <span class="stat-value">@DonjonData.Salles.Count</span>
+                    </div>
+                </div>
+
+                <button class="start-btn" @onclick="Start">Entrer dans le donjon</button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public Guid id { get; set; }
+
+    private string Error = string.Empty;
+    private bool Loading;
+    private Donjon? DonjonData;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Error = string.Empty;
+        Loading = true;
+        DonjonData = null;
+
+        try
+        {
+            DonjonData = await Http.GetFromJsonAsync<Donjon>($"/api/donjons/{id}");
+        }
+        catch (Exception ex)
+        {
+            Error = $"Erreur: {ex.Message}";
+        }
+        finally
+        {
+            Loading = false;
+        }
+    }
+
+    private async Task Start()
+    {
+        var guestId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+
+        var res = await Http.PostAsJsonAsync("/api/parties", new
+        {
+            JoueurId = guestId,
+            DonjonId = id
+        });
+
+        if (res.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            Error = "Ce donjon a déjà été joué. Génère un nouveau donjon.";
+            return;
+        }
+
+        var partie = await res.Content.ReadFromJsonAsync<Partie>();
+        if (partie is null)
+        {
+            Error = "Démarrage impossible.";
+            return;
+        }
+
+        State.ResetForDonjon(id, partie.Id);
+
+        var firstId = DonjonData?.Salles?.FirstOrDefault()?.Id;
+        if (firstId is null)
+        {
+            Error = "Donjon vide.";
+            return;
+        }
+
+        Nav.NavigateTo($"/salle/{id}/{firstId}");
+    }
+}

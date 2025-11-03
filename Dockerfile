@@ -29,3 +29,5 @@ ENTRYPOINT ["dotnet", "BlazorGame.GameService.dll"]
 
 FROM nginx:alpine AS client
 COPY --from=build-client /app/publish/wwwroot /usr/share/nginx/html
+COPY default.conf /etc/nginx/conf.d/default.conf
+

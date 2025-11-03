@@ -1,0 +1,164 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.adventure-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.adventure-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.background-filter {
+    display: none;
+}
+
+.content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    width: 100%;
+}
+
+.title {
+    color: white;
+    font-size: 3rem;
+    margin-bottom: 80px;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.levels {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    flex-wrap: nowrap;
+    padding: 0 40px;
+    width: 100%;
+}
+
+.level-btn {
+    border: 3px solid rgba(255, 215, 0, 0.8);
+    cursor: pointer;
+    border-radius: 20px;
+    padding: 40px 35px;
+    flex: 1;
+    max-width: 350px;
+    color: white;
+    font-weight: bold;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.level-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.level-btn:hover::before {
+    left: 100%;
+}
+
+.level-btn:hover {
+    transform: translateY(-12px) scale(1.05);
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.6), inset 0 0 30px rgba(255, 215, 0, 0.2), 0 20px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 215, 0, 1);
+}
+
+.level-btn:active {
+    transform: translateY(-6px) scale(0.98);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(255, 215, 0, 0.15);
+}
+
+.level-1 {
+    background: linear-gradient(135deg, #4c7ba7, #2d5a8e);
+}
+
+.level-2 {
+    background: linear-gradient(135deg, #6b5ba1, #4a3f7d);
+}
+
+.level-3 {
+    background: linear-gradient(135deg, #7b5a8f, #5a3e70);
+}
+
+.level-num {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.level-name {
+    font-size: 1.3rem;
+    display: block;
+}
+
+.level-desc {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+@media (max-width: 1024px) {
+    .levels {
+        gap: 20px;
+    }
+    
+    .level-btn {
+        width: 160px;
+        padding: 30px 25px;
+        gap: 10px;
+    }
+    
+    .level-num {
+        font-size: 2rem;
+    }
+    
+    .level-name {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .title {
+        font-size: 2rem;
+        margin-bottom: 50px;
+    }
+    
+    .levels {
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+    }
+    
+    .level-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}

@@ -1,0 +1,204 @@
+@page "/salle/{donjonId:guid}/{idSalle:guid}"
+@using System.Net.Http.Json
+@using SharedModels.Domain.Gameplay
+@using SharedModels.Domain.Common
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject BlazorGame.Client.Services.GameState State
+
+<link rel="stylesheet" href="css/salle.css">
+
+<div class="salle-container">
+  <div class="salle-content">
+
+    <div class="topbar">
+      <span class="pill">Donjon: @donjonId</span>
+      <span class="pill">Score: <strong>@State.Score</strong></span>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Error)) { <div class="error">@Error</div> }
+
+    @if (Loading)
+    {
+        <div class="loading-salle">
+            <div class="spinner"></div>
+            <p>Chargement de la salle…</p>
+        </div>
+    }
+    else if (DonjonData is null)
+    {
+        <div class="error">Donjon introuvable.</div>
+    }
+    else if (SalleData is null)
+    {
+        <div class="error">Salle introuvable.</div>
+    }
+    else
+    {
+        <div class="salle-card">
+            <h1 class="salle-title">@SalleData.Titre</h1>
+            <p class="salle-description">@SalleData.Description</p>
+
+            <div class="salle-info">
+                <div class="info-badge">
+                    <span class="badge-label">Type</span>
+                    <span class="badge-value">@SalleData.Type</span>
+                </div>
+                <div class="info-badge">
+                    <span class="badge-label">Difficulté</span>
+                    <span class="badge-value">@SalleData.Difficulte</span>
+                </div>
+            </div>
+
+            <div class="effects-section">
+                <h3 class="section-title">Choix (un seul)</h3>
+
+                @if (SalleData.ChoixProposes?.Count > 0)
+                {
+                    <ul class="choices-list">
+                        @for (var i = 0; i < SalleData.ChoixProposes.Count; i++)
+                        {
+                            var c = SalleData.ChoixProposes.ElementAt(i);
+                            <li class="choice-item">
+                                <button class="btn-choice" disabled="@HasChosen" @onclick="() => Choose(c)">
+                                    @c.Libelle
+                                </button>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="muted">Aucun choix disponible.</div>
+                }
+
+                @if (HasChosen)
+                {
+                    <div class="result-box">
+                        <div class="result-title">Résultat</div>
+                        <div class="result-line">@ChoiceResult</div>
+                        <div class="result-score">Score: <strong>@State.Score</strong></div>
+                        @if (Dead)
+                        {
+                            <div class="error" style="margin-top:.5rem">Vous êtes mort.</div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="action-buttons">
+                @if (!Dead && NextSalleId is not null)
+                {
+                    <button class="btn-next" @onclick="GoNext" disabled="@(!HasChosen)">Salle suivante →</button>
+                }
+                else
+                {
+                    <button class="btn-finish" @onclick="@(() => Nav.NavigateTo($"/donjon/{donjonId}"))" disabled="@(!HasChosen)">Terminer le donjon</button>
+                }
+            </div>
+        </div>
+
+        @if (State.Journal.Count > 0)
+        {
+            <div class="journal">
+                <h4>Journal</h4>
+                <ul>
+                    @foreach (var line in State.Journal)
+                    {
+                        <li>@line</li>
+                    }
+                </ul>
+            </div>
+        }
+    }
+  </div>
+</div>
+
+@code {
+    [Parameter] public Guid donjonId { get; set; }
+    [Parameter] public Guid idSalle { get; set; }
+
+    private string Error = string.Empty;
+    private bool Loading;
+    private Donjon? DonjonData;
+    private Salle? SalleData;
+    private Guid? NextSalleId;
+
+    private bool HasChosen;
+    private bool Dead;
+    private string ChoiceResult = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Error = string.Empty;
+        Loading = true;
+        HasChosen = false;
+        Dead = false;
+        ChoiceResult = string.Empty;
+
+        try
+        {
+            DonjonData = await Http.GetFromJsonAsync<Donjon>($"/api/donjons/{donjonId}");
+            if (DonjonData is null || DonjonData.Salles is null || DonjonData.Salles.Count == 0) return;
+
+            var list = DonjonData.Salles.ToList();
+            SalleData = list.FirstOrDefault(s => s.Id == idSalle);
+            if (SalleData is null) return;
+
+            var idx = list.FindIndex(s => s.Id == idSalle);
+            NextSalleId = (idx >= 0 && idx + 1 < list.Count) ? list[idx + 1].Id : null;
+
+            if (idx == 0)
+            {
+                State.Reset();
+            }
+        }
+        catch (Exception ex)
+        {
+            Error = $"Erreur: {ex.Message}";
+        }
+        finally { Loading = false; }
+    }
+
+    private void Choose(Choix c)
+    {
+        if (HasChosen || c is null) return;
+
+        int delta = 0;
+        bool mortInstant = false;
+
+        foreach (var e in c.Effets)
+        {
+            switch (e.Type)
+            {
+                case TypeEffet.GainPoints:   delta += e.Valeur; break;
+                case TypeEffet.PertePoints:  delta += e.Valeur; break;
+                case TypeEffet.MortInstantanee: mortInstant = true; break;
+            }
+        }
+
+        if (mortInstant)
+        {
+            State.Apply(delta, $"{SalleData?.Titre}: Mort instantanée");
+            Dead = true;
+            ChoiceResult = "Mort instantanée.";
+        }
+        else
+        {
+            State.Apply(delta, $"{SalleData?.Titre}: {c.Libelle} {(delta>=0?"+":"")}{delta}");
+            if (State.Score < 0)
+            {
+                Dead = true;
+                ChoiceResult += " — Score négatif (mort).";
+            }
+        }
+
+        HasChosen = true;
+    }
+
+    private void GoNext()
+    {
+        if (NextSalleId is null || Dead) return;
+        Nav.NavigateTo($"/salle/{donjonId}/{NextSalleId}");
+    }
+}

@@ -1,16 +1,14 @@
 @page "/"
 
-<div class="home-container">
-    <div class="background-slider">
-        <div class="bg-slide bg-slide-1"></div>
-        <div class="bg-slide bg-slide-2"></div>
-        <div class="bg-slide bg-slide-3"></div>
-    </div>
+<link rel="stylesheet" href="css/home.css">
 
-    <div class="content-overlay">
-        <div class="hero-section">
-            <button class="btn-play" @onclick="StartAdventure">Jouer</button>
-        </div>
+<div class="home-container">
+    <video autoplay muted loop>
+        <source src="videos/background.mp4" type="video/mp4">
+    </video>
+
+    <div class="hero-section">
+        <button class="btn-play" @onclick="StartAdventure">Nouvelle aventure</button>
     </div>
 
     <nav class="bottom-nav">

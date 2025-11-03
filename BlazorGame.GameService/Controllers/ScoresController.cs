@@ -1,37 +1,33 @@
+// BlazorGame.GameService/Controllers/ScoresController.cs
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using BlazorGame.GameService.Persistence;
 using SharedModels.Domain.Scores;
 
 namespace BlazorGame.GameService.Controllers
 {
-    /// <summary>
-    /// Endpoints liés aux scores (sauvegarde du score final d'une partie + leaderboard).
-    /// </summary>
+    /// <summary>Endpoints scores (création, lecture, leaderboard).</summary>
     [ApiController]
     [Route("api/[controller]")]
     public class ScoresController : ControllerBase
     {
-        private readonly Repository<Score> _scoreRepo;
+        private readonly GameDbContext _db;
 
-        /// <summary>
-        /// Construit le contrôleur score.
-        /// </summary>
-        /// <param name="scoreRepo">Repository Score pour lecture/écriture.</param>
-        public ScoresController(Repository<Score> scoreRepo)
+        /// <summary>Construit le contrôleur.</summary>
+        /// <param name="db">DbContext.</param>
+        public ScoresController(GameDbContext db)
         {
-            _scoreRepo = scoreRepo;
+            _db = db;
         }
 
-        /// <summary>
-        /// Enregistre le score final d'une partie jouée.
-        /// </summary>
-        /// <param name="request">JoueurId, PartieId, valeur du score.</param>
-        /// <param name="ct">Token d'annulation.</param>
-        /// <returns>Le score créé.</returns>
+        /// <summary>Crée un score manuel.</summary>
+        /// <param name="request">JoueurId, PartieId, Valeur.</param>
+        /// <param name="ct">Annulation.</param>
+        /// <returns>Score créé.</returns>
         [HttpPost]
         public async Task<ActionResult<Score>> Post([FromBody] ScoreRequest request, CancellationToken ct)
         {
-            var score = new Score
+            var s = new Score
             {
                 Id = Guid.NewGuid(),
                 JoueurId = request.JoueurId,
@@ -39,63 +35,48 @@ namespace BlazorGame.GameService.Controllers
                 Valeur = request.Valeur,
                 EnregistreLe = DateTime.UtcNow
             };
-
-            await _scoreRepo.AddAsync(score, ct);
-            return Ok(score);
+            await _db.Scores.AddAsync(s, ct);
+            await _db.SaveChangesAsync(ct);
+            return Ok(s);
         }
 
-        /// <summary>
-        /// Retourne tous les scores enregistrés.
-        /// </summary>
-        /// <param name="ct">Token d'annulation.</param>
-        /// <returns>Liste de tous les scores.</returns>
+        /// <summary>Retourne tous les scores.</summary>
+        /// <param name="ct">Annulation.</param>
+        /// <returns>Liste des scores.</returns>
         [HttpGet]
         public async Task<ActionResult<List<Score>>> GetAll(CancellationToken ct)
         {
-            var list = await _scoreRepo.ListAsync(ct);
+            var list = await _db.Scores.AsNoTracking()
+                .OrderByDescending(x => x.EnregistreLe)
+                .ToListAsync(ct);
             return Ok(list);
         }
 
-        /// <summary>
-        /// Retourne le top 10 des meilleurs scores (leaderboard global).
-        /// </summary>
-        /// <param name="ct">Token d'annulation.</param>
-        /// <returns>Liste des meilleurs scores triés par valeur décroissante.</returns>
+        /// <summary>Top 10 par valeur décroissante.</summary>
+        /// <param name="ct">Annulation.</param>
+        /// <returns>Top 10.</returns>
         [HttpGet("leaderboard")]
-        public async Task<ActionResult<List<object>>> GetLeaderboard(CancellationToken ct)
+        public async Task<ActionResult<List<object>>> Leaderboard(CancellationToken ct)
         {
-            var list = await _scoreRepo.ListAsync(ct);
-
-            var board = list
+            var list = await _db.Scores.AsNoTracking()
                 .OrderByDescending(s => s.Valeur)
+                .ThenBy(s => s.EnregistreLe)
                 .Take(10)
-                .Select(s => new
-                {
-                    s.JoueurId,
-                    s.PartieId,
-                    s.Valeur,
-                    s.EnregistreLe
-                })
-                .ToList();
+                .Select(s => new { s.JoueurId, s.PartieId, s.Valeur, s.EnregistreLe })
+                .ToListAsync(ct);
 
-            return Ok(board);
+            return Ok(list);
         }
 
-        /// <summary>
-        /// Modèle pour créer un nouveau score.
-        /// </summary>
+        /// <summary>Payload création score.</summary>
         public class ScoreRequest
         {
-            /// <summary>Id du joueur lié à ce score.</summary>
+            /// <summary>Id joueur.</summary>
             public Guid JoueurId { get; set; }
-
-            /// <summary>Id de la partie jouée.</summary>
+            /// <summary>Id partie.</summary>
             public Guid PartieId { get; set; }
-
-            /// <summary>Valeur numérique du score final.</summary>
+            /// <summary>Valeur.</summary>
             public int Valeur { get; set; }
         }
     }
 }
-
-

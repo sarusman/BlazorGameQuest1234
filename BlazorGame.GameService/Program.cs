@@ -11,18 +11,17 @@ builder.Services.AddDbContext<GameDbContext>(options =>
 
 builder.Services.AddScoped(typeof(Repository<>));
 builder.Services.AddScoped<GameplayService>();
+builder.Services.AddSingleton<SalleService>();
+builder.Services.AddScoped<DonjonService>();
+builder.Services.AddScoped<PartieService>();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowClient",
-        policy =>
-        {
-            policy
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader();
-        });
-});
+builder.Services.AddCors(o =>
+    o.AddPolicy("AllowBlazorClient", p =>
+        p.WithOrigins("http://localhost:5003")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+    )
+);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -36,8 +35,28 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<BlazorGame.GameService.Persistence.GameDbContext>();
+    db.Database.EnsureCreated();
 
-app.UseCors("AllowClient");
+    var guestId = Guid.Parse("00000000-0000-0000-0000-000000000001"); // pour tester
+    if (!db.Joueurs.Any(j => j.Id == guestId))
+    {
+        db.Joueurs.Add(new SharedModels.Domain.Users.Joueur
+        {
+            Id = guestId,
+            Pseudo = "Guest",
+            KeycloakUserName = "guest",
+            Actif = true
+        });
+        db.SaveChanges();
+    }
+}
+
+
+app.UseStaticFiles();
+app.UseCors("AllowBlazorClient");
 
 if (app.Environment.IsDevelopment())
 {
@@ -49,5 +68,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 app.Run();
