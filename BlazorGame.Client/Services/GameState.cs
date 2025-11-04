@@ -51,5 +51,10 @@ namespace BlazorGame.Client.Services
         /// <summary>Marque la partie comme terminée.</summary>
         /// <returns>Rien.</returns>
         public void SetFinished() => Finished = true;
+
+        /// <summary>Définit le score depuis le serveur (synchronisation).</summary>
+        /// <param name="score">Score du serveur.</param>
+        /// <returns>Rien.</returns>
+        public void SetScore(int score) => Score = score;
     }
 }

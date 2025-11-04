@@ -160,40 +160,72 @@
         finally { Loading = false; }
     }
 
-    private void Choose(Choix c)
+    private async Task Choose(Choix c)
     {
-        if (HasChosen || c is null) return;
+        if (HasChosen || c is null || State.PartieId is null) return;
 
-        int delta = 0;
-        bool mortInstant = false;
-
-        foreach (var e in c.Effets)
+        try
         {
-            switch (e.Type)
+            Loading = true;
+            var response = await Http.PostAsJsonAsync($"/api/parties/{State.PartieId}/choisir", new
             {
-                case TypeEffet.GainPoints:   delta += e.Valeur; break;
-                case TypeEffet.PertePoints:  delta += e.Valeur; break;
-                case TypeEffet.MortInstantanee: mortInstant = true; break;
-            }
-        }
+                SalleId = idSalle,
+                ChoixId = c.Id
+            });
 
-        if (mortInstant)
-        {
-            State.Apply(delta, $"{SalleData?.Titre}: Mort instantanée");
-            Dead = true;
-            ChoiceResult = "Mort instantanée.";
-        }
-        else
-        {
-            State.Apply(delta, $"{SalleData?.Titre}: {c.Libelle} {(delta>=0?"+":"")}{delta}");
-            if (State.Score < 0)
+            if (!response.IsSuccessStatusCode)
             {
-                Dead = true;
-                ChoiceResult += " — Score négatif (mort).";
+                Error = $"Erreur lors de l'application du choix: {response.StatusCode}";
+                Loading = false;
+                return;
             }
-        }
 
-        HasChosen = true;
+            var result = await response.Content.ReadFromJsonAsync<ChoisirResponse>();
+            if (result is null)
+            {
+                Error = "Réponse invalide du serveur.";
+                Loading = false;
+                return;
+            }
+
+            // Mettre à jour le state avec le score du serveur
+            State.SetScore(result.Score);
+            Dead = result.Mort;
+            
+            if (result.Mort)
+            {
+                ChoiceResult = "Mort instantanée.";
+                State.Journal.Add($"{SalleData?.Titre}: Mort instantanée");
+            }
+            else
+            {
+                ChoiceResult = $"{SalleData?.Titre}: {c.Libelle}";
+                State.Journal.Add($"{SalleData?.Titre}: {c.Libelle} (Score: {result.Score})");
+            }
+
+            if (result.Fini)
+            {
+                State.SetFinished();
+            }
+
+            HasChosen = true;
+        }
+        catch (Exception ex)
+        {
+            Error = $"Erreur: {ex.Message}";
+        }
+        finally
+        {
+            Loading = false;
+        }
+    }
+
+    private class ChoisirResponse
+    {
+        public int Score { get; set; }
+        public bool Mort { get; set; }
+        public bool Fini { get; set; }
+        public Guid? NextSalleId { get; set; }
     }
 
     private void GoNext()

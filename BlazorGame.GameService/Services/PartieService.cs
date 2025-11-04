@@ -44,6 +44,7 @@ namespace BlazorGame.GameService.Services
             };
 
             await _db.Parties.AddAsync(p, ct);
+            await _db.SaveChangesAsync(ct);
 
             var sInit = new Score
             {
@@ -120,6 +121,7 @@ namespace BlazorGame.GameService.Services
                 ScoreApres = scoreApres,
                 MortIci = mortIci
             };
+            await _db.Etapes.AddAsync(etape, ct);
 
             p.Etapes.Add(etape);
             p.ScoreFinal = scoreApres;
@@ -147,7 +149,6 @@ namespace BlazorGame.GameService.Services
             {
                 ligne.Valeur = scoreApres < 0 ? 0 : scoreApres;
                 ligne.EnregistreLe = DateTime.UtcNow;
-                _db.Scores.Update(ligne);
             }
 
             await _db.SaveChangesAsync(ct);
