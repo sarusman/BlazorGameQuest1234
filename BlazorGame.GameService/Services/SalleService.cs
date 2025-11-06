@@ -1,4 +1,5 @@
-using SharedModels.Domain.Common;
+using SharedModels.Domain.Common.Enums;
+using SharedModels.Domain.Common.Records;
 using SharedModels.Domain.Gameplay;
 
 namespace BlazorGame.GameService.Services

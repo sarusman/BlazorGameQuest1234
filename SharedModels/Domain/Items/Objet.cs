@@ -1,3 +1,4 @@
+using SharedModels.Domain.Common.Enums;
 using SharedModels.Domain.Common;
 
 namespace SharedModels.Domain.Items
@@ -7,7 +8,7 @@ namespace SharedModels.Domain.Items
     {
         public string Nom { get; set; } = string.Empty;
         public string? Description { get; set; }
-        public Rareté Rarete { get; set; } = Rareté.Commun;
+        public Rarete Rarete { get; set; } = Rarete.Commun;
         public string? Code { get; set; }
     }
 }

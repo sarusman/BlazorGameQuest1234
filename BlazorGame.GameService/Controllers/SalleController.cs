@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using BlazorGame.GameService.Services;
 using SharedModels.Domain.Gameplay;
-using SharedModels.Domain.Common;
+using SharedModels.Domain.Common.Enums;
 
 namespace BlazorGame.GameService.Controllers
 {

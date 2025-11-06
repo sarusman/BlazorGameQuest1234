@@ -1,117 +1,93 @@
 @page "/salle/{donjonId:guid}/{idSalle:guid}"
 @using System.Net.Http.Json
 @using SharedModels.Domain.Gameplay
-@using SharedModels.Domain.Common
+@using SharedModels.Domain.Common.Enums
 @inject HttpClient Http
 @inject NavigationManager Nav
 @inject BlazorGame.Client.Services.GameState State
 
 <link rel="stylesheet" href="css/salle.css">
 
-<div class="salle-container">
-  <div class="salle-content">
+<div class="salle-container" data-type="@SalleData?.Type.ToString().ToLower()">
+    <video autoplay muted loop class="background-video">
+        <source src="@GetVideoUrl()" type="video/mp4">
+    </video>
 
-    <div class="topbar">
-      <span class="pill">Donjon: @donjonId</span>
-      <span class="pill">Score: <strong>@State.Score</strong></span>
-    </div>
-
-    @if (!string.IsNullOrWhiteSpace(Error)) { <div class="error">@Error</div> }
-
-    @if (Loading)
-    {
-        <div class="loading-salle">
-            <div class="spinner"></div>
-            <p>Chargement de la salle…</p>
+    <div class="salle-content">
+        <div class="topbar">
+            <span class="score-badge">Score: <strong>@State.Score</strong></span>
         </div>
-    }
-    else if (DonjonData is null)
-    {
-        <div class="error">Donjon introuvable.</div>
-    }
-    else if (SalleData is null)
-    {
-        <div class="error">Salle introuvable.</div>
-    }
-    else
-    {
-        <div class="salle-card">
-            <h1 class="salle-title">@SalleData.Titre</h1>
-            <p class="salle-description">@SalleData.Description</p>
 
-            <div class="salle-info">
-                <div class="info-badge">
-                    <span class="badge-label">Type</span>
-                    <span class="badge-value">@SalleData.Type</span>
-                </div>
-                <div class="info-badge">
-                    <span class="badge-label">Difficulté</span>
-                    <span class="badge-value">@SalleData.Difficulte</span>
-                </div>
+        @if (!string.IsNullOrWhiteSpace(Error))
+        {
+            <div class="error">@Error</div>
+        }
+
+        @if (Loading)
+        {
+            <div class="loading-salle">
+                <div class="spinner"></div>
+                <p>Chargement…</p>
             </div>
+        }
+        else if (DonjonData is null || SalleData is null)
+        {
+            <div class="error">Erreur de chargement.</div>
+        }
+        else
+        {
+            <div class="salle-card">
+                <h1 class="salle-title">@SalleData.Titre</h1>
+                <p class="salle-description">@SalleData.Description</p>
 
-            <div class="effects-section">
-                <h3 class="section-title">Choix (un seul)</h3>
+                <div class="salle-meta">
+                    <span class="meta-badge">@SalleData.Type</span>
+                    <span class="meta-badge">@SalleData.Difficulte</span>
+                </div>
 
-                @if (SalleData.ChoixProposes?.Count > 0)
-                {
-                    <ul class="choices-list">
-                        @for (var i = 0; i < SalleData.ChoixProposes.Count; i++)
-                        {
-                            var c = SalleData.ChoixProposes.ElementAt(i);
-                            <li class="choice-item">
-                                <button class="btn-choice" disabled="@HasChosen" @onclick="() => Choose(c)">
+                <div class="choices-section">
+                    <h3>Que fais-tu ?</h3>
+                    @if (SalleData.ChoixProposes?.Count > 0)
+                    {
+                        <div class="choices-grid">
+                            @foreach (var c in SalleData.ChoixProposes)
+                            {
+                                <button class="choice-btn" disabled="@HasChosen" @onclick="() => Choose(c)">
                                     @c.Libelle
                                 </button>
-                            </li>
-                        }
-                    </ul>
-                }
-                else
-                {
-                    <div class="muted">Aucun choix disponible.</div>
-                }
+                            }
+                        </div>
+                    }
+                </div>
 
                 @if (HasChosen)
                 {
-                    <div class="result-box">
-                        <div class="result-title">Résultat</div>
+                    <div class="result-panel">
                         <div class="result-line">@ChoiceResult</div>
-                        <div class="result-score">Score: <strong>@State.Score</strong></div>
                         @if (Dead)
                         {
-                            <div class="error" style="margin-top:.5rem">Vous êtes mort.</div>
+                            <div class="result-death">MORT</div>
+                        }
+                        else
+                        {
+                            <div class="result-score">Score: <strong>@State.Score</strong></div>
+                        }
+                    </div>
+
+                    <div class="action-buttons">
+                        @if (!Dead && NextSalleId is not null)
+                        {
+                            <button class="btn-continue" @onclick="GoNext">Continuer →</button>
+                        }
+                        else
+                        {
+                            <button class="btn-finish" @onclick="@(() => Nav.NavigateTo($"/donjon/{donjonId}"))">Retour au donjon</button>
                         }
                     </div>
                 }
             </div>
-
-            <div class="action-buttons">
-                @if (!Dead && NextSalleId is not null)
-                {
-                    <button class="btn-next" @onclick="GoNext" disabled="@(!HasChosen)">Salle suivante →</button>
-                }
-                else
-                {
-                    <button class="btn-finish" @onclick="@(() => Nav.NavigateTo($"/donjon/{donjonId}"))" disabled="@(!HasChosen)">Terminer le donjon</button>
-                }
-            </div>
-        </div>
-
-        @if (State.Journal.Count > 0)
-        {
-            <div class="journal">
-                <h4>Journal</h4>
-                <ul>
-                    @foreach (var line in State.Journal)
-                    {
-                        <li>@line</li>
-                    }
-                </ul>
-            </div>
         }
-    }
-  </div>
+    </div>
 </div>
 
 @code {
@@ -139,7 +115,7 @@
         try
         {
             DonjonData = await Http.GetFromJsonAsync<Donjon>($"/api/donjons/{donjonId}");
-            if (DonjonData is null || DonjonData.Salles is null || DonjonData.Salles.Count == 0) return;
+            if (DonjonData?.Salles is null || DonjonData.Salles.Count == 0) return;
 
             var list = DonjonData.Salles.ToList();
             SalleData = list.FirstOrDefault(s => s.Id == idSalle);
@@ -148,16 +124,26 @@
             var idx = list.FindIndex(s => s.Id == idSalle);
             NextSalleId = (idx >= 0 && idx + 1 < list.Count) ? list[idx + 1].Id : null;
 
-            if (idx == 0)
-            {
-                State.Reset();
-            }
+            if (idx == 0) State.Reset();
         }
         catch (Exception ex)
         {
             Error = $"Erreur: {ex.Message}";
         }
         finally { Loading = false; }
+    }
+
+    private string GetVideoUrl()
+    {
+        return SalleData?.Type switch
+        {
+            TypeSalle.Combat => "/videos/combat.mp4",
+            TypeSalle.Coffre => "/videos/coffre.mp4",
+            TypeSalle.Piege => "/videos/piege.mp4",
+            TypeSalle.Rencontre => "/videos/rencontre.mp4",
+            TypeSalle.Enigme => "/videos/enigme.mp4",
+            _ => "/videos/repos.mp4"
+        };
     }
 
     private async Task Choose(Choix c)
@@ -175,7 +161,7 @@
 
             if (!response.IsSuccessStatusCode)
             {
-                Error = $"Erreur lors de l'application du choix: {response.StatusCode}";
+                Error = $"Erreur: {response.StatusCode}";
                 Loading = false;
                 return;
             }
@@ -183,41 +169,23 @@
             var result = await response.Content.ReadFromJsonAsync<ChoisirResponse>();
             if (result is null)
             {
-                Error = "Réponse invalide du serveur.";
+                Error = "Réponse invalide.";
                 Loading = false;
                 return;
             }
 
-            // Mettre à jour le state avec le score du serveur
             State.SetScore(result.Score);
             Dead = result.Mort;
-            
-            if (result.Mort)
-            {
-                ChoiceResult = "Mort instantanée.";
-                State.Journal.Add($"{SalleData?.Titre}: Mort instantanée");
-            }
-            else
-            {
-                ChoiceResult = $"{SalleData?.Titre}: {c.Libelle}";
-                State.Journal.Add($"{SalleData?.Titre}: {c.Libelle} (Score: {result.Score})");
-            }
+            ChoiceResult = Dead ? "Vous êtes tombé au combat..." : $"{c.Libelle} — +{result.Score} points";
 
-            if (result.Fini)
-            {
-                State.SetFinished();
-            }
-
+            if (result.Fini) State.SetFinished();
             HasChosen = true;
         }
         catch (Exception ex)
         {
             Error = $"Erreur: {ex.Message}";
         }
-        finally
-        {
-            Loading = false;
-        }
+        finally { Loading = false; }
     }
 
     private class ChoisirResponse
@@ -225,7 +193,6 @@
         public int Score { get; set; }
         public bool Mort { get; set; }
         public bool Fini { get; set; }
-        public Guid? NextSalleId { get; set; }
     }
 
     private void GoNext()

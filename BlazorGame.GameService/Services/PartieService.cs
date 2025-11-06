@@ -3,7 +3,7 @@ using BlazorGame.GameService.Persistence;
 using Microsoft.EntityFrameworkCore;
 using SharedModels.Domain.Gameplay;
 using SharedModels.Domain.Scores;
-using SharedModels.Domain.Common;
+using SharedModels.Domain.Common.Enums;
 
 namespace BlazorGame.GameService.Services
 {

@@ -1,6 +1,6 @@
 using BlazorGame.GameService.Persistence;
 using Microsoft.EntityFrameworkCore;
-using SharedModels.Domain.Common;
+using SharedModels.Domain.Common.Enums;
 using SharedModels.Domain.Gameplay;
 
 namespace BlazorGame.GameService.Services

@@ -1,4 +1,5 @@
 using SharedModels.Domain.Common;
+using SharedModels.Domain.Common.Enums;
 
 namespace SharedModels.Domain.Gameplay
 {
