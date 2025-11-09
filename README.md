@@ -46,8 +46,7 @@ Sarusman SATKUNARAJAH
   * CORS ouvert client→API
   * Routes SPA gérées côté Nginx
     
-## NOTES 
-IA & outillage
+## IA & outillage
 
 **Vidéos : générées avec Google Veo 3 (boucles MP4).**
 
