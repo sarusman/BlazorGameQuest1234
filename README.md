@@ -9,7 +9,7 @@ Sarusman SATKUNARAJAH
 
 # Version 2 - Cahier des charges
 
-## Démarrage VERSION 2
+## Démarrage VERSION 3
 
 `docker compose up --build` <br>
 
@@ -17,15 +17,54 @@ Sarusman SATKUNARAJAH
 - UI (Gateway) : http://localhost:5000
 - Backend swagger (Serveur) : http://localhost:8080/swagger/index.html
 
+(Même IHM)
 <img width="1600" height="1243" alt="hLZDRjj64BxhAHRA8R9XMxOJfqxX6gKeob6YlufoWYBEOIMkPJhKhhfSsb427me41GeKRT6aADgBUsgYOs_jfHUzILwWVeJExbBIIgJi01LjsDHmvfl_cQK-3mNc8ke56U6BWA2hov___lUl7z3gQY70Bna_m3s2rb4fY5uWxpRkzqc0SXNI4H4dA8z6ttQuB-zNLbSpcV2vJ_kOunvguyxpBcSHzM" src="https://github.com/user-attachments/assets/cc60276c-d95c-4d55-8752-a0af412e07d8" />
 
-## Test VERSION 2
+## Fonctionnement de la version 3 : 
 
+* **Démarrer** : page d’accueil → **Nouvelle aventure** → génération d’un **donjon** selon la difficulté
+
+  * **Facile**: 2 salles · **Normal**: 3 · **Difficile**: 5 (toutes **différentes**)
+
+* **Jouer** : `/donjon/{donjonId}` → **Entrer** → création d’une **Partie** (on peux pas rejouer le même donjon pour le même joueur)
+
+* **Salles** : `/salle/{donjonId}/{idSalle}`
+
+  * Vidéo d’ambiance selon le type (Combat, Coffre, Piège, Enigme, Repos)
+  * **Un choix** par salle (Combattre, Fuir, Ouvrir, etc.)
+
+* **Règles** :
+
+  * Score mis à jour par addition/soustraction d’effets
+  * **Mort** si effet mort instantanée ou score < 0 (à 0 : encore en vie)
+  * Fin quand mort ou dernière salle atteinte
+
+* **Scores** : à la fin, enregistrement du score final (≥ 0) dans `Scores` → **Leaderboard** = top 10 par score décroissant
+
+* **Tech** : Blazor WASM (client) + ASP.NET Core API (GameService) + EF Core InMemory.
+
+  * CORS ouvert client→API
+  * Routes SPA gérées côté Nginx
+    
+## NOTES 
+IA & outillage
+
+**Vidéos : générées avec Google Veo 3 (boucles MP4).**
+
+**CSS : design initial produit avec Claude AI.** : **Les médias/feuilles de style ont été générés avec l’aide d’IA puis adaptés manuellement**
+
+**Serveur : front servi par Nginx (SPA fallback activé).**
+
+
+## Test VERSION 3
+
+(Automatiquement éxécuté dans le CI : https://github.com/sarusman/BlazorGameQuest1234/actions).
+Vous pouvez aussi lancer : <br>
 `dotnet test`
 
-# Version 1 - Cahier des charges
+# Version 3 - Cahier des charges
+<img width="705" height="418" alt="Capture d’écran 2025-11-09 à 14 05 38" src="https://github.com/user-attachments/assets/a99d07b3-d7a1-46d8-baf0-44f4312b78db" />
 
-https://github.com/sarusman/BlazorGameQuest1234/tree/V1
 
 ## Mise en place d’une Intégration Continue (CI)
 
@@ -50,13 +89,10 @@ https://github.com/sarusman/BlazorGameQuest1234/actions
 # Comment démarrer le projet
 
 ## 1. Cloner le dépôt
-git clone https://github.com/sarusman/BlazorGameQuest1234.git
-cd BlazorGameQuest1234
+`git clone https://github.com/sarusman/BlazorGameQuest1234.git`
+`cd BlazorGameQuest1234`
 <img src=".github/images/image-2.png" alt="Cloner dépôt" width="300"/>
 
 
-## 2. Restaurer les dépendances
-dotnet restore
-
-## 3. Builder le projet
-dotnet build
+## 2. Utiliser une image Docker
+`docker compose up --build`
