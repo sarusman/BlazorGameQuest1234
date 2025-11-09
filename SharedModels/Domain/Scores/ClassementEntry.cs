@@ -13,3 +13,5 @@ namespace SharedModels.Domain.Scores
         public int PartiesGagnees { get; set; }
     }
 }
+
+
