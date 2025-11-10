@@ -67,62 +67,65 @@
     text-align: center;
 }
 
-.victory-title {
-    color: #ffd700;
+.result-title {
     font-size: 3rem;
     margin-bottom: 10px;
     text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
 }
 
-.victory-subtitle {
-    color: rgba(255, 255, 255, 0.8);
+.result-subtitle {
     font-size: 1.2rem;
     margin-bottom: 40px;
 }
 
-.leaderboard {
+.victory-card.victory .result-title {
+    color: #00ff41;
+    text-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+}
+
+.victory-card.victory .result-subtitle {
+    color: #00ff41;
+}
+
+.victory-card.defeat {
+    border-color: #ff6b6b;
+}
+
+.victory-card.defeat .result-title {
+    color: #ff6b6b;
+    text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+}
+
+.victory-card.defeat .result-subtitle {
+    color: #ff6b6b;
+}
+
+.final-score {
     margin: 40px 0;
-    text-align: left;
-}
-
-.leaderboard h2 {
-    color: white;
-    font-size: 1.3rem;
-    margin-bottom: 20px;
-}
-
-.scores-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.score-row {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+    padding: 30px;
     background: rgba(100, 150, 200, 0.1);
-    border-left: 3px solid rgba(255, 215, 0, 0.3);
-    padding: 15px 20px;
-    border-radius: 8px;
+    border-radius: 10px;
 }
 
-.score-row.rank-1 {
-    background: rgba(255, 215, 0, 0.15);
-    border-left: 3px solid #ffd700;
-}
-
-.rank {
-    color: #ffd700;
-    font-weight: bold;
-    min-width: 30px;
+.final-score h2 {
+    color: white;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    text-transform: uppercase;
 }
 
 .score-value {
-    color: white;
+    color: #ffd700;
+    font-size: 2.5rem;
     font-weight: bold;
-    flex: 1;
-    text-align: right;
+}
+
+.victory-card.victory .score-value {
+    color: #00ff41;
+}
+
+.victory-card.defeat .score-value {
+    color: #ff6b6b;
 }
 
 .action-buttons {
@@ -146,20 +149,17 @@
     color: #000;
 }
 
+.btn-retry:hover {
+    transform: translateY(-2px);
+}
+
 .btn-home {
     background: linear-gradient(135deg, #4c7ba7, #2d5a8e);
     color: white;
 }
-.victory-card.defeat {
-    border-color: #ff6b6b;
-}
 
-.victory-card.defeat .result-title {
-    color: #ff6b6b;
-}
-
-.victory-card.defeat .result-subtitle {
-    color:  #ff6b6b;
+.btn-home:hover {
+    transform: translateY(-2px);
 }
 
 @media (max-width: 768px) {
@@ -167,11 +167,16 @@
         padding: 30px 20px;
     }
 
-    .victory-title {
+    .result-title {
         font-size: 2rem;
+    }
+
+    .score-value {
+        font-size: 1.8rem;
     }
 
     .action-buttons {
         flex-direction: column;
     }
 }
+

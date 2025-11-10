@@ -61,7 +61,6 @@
 
         try
         {
-            // Garde la route demandée: /api/scores/score/{donjonId}
             var dto = await Http.GetFromJsonAsync<ScoreDto?>($"/api/scores/score/{donjonId}");
             ScoreFinal = dto?.Valeur;
         }

@@ -62,10 +62,10 @@ namespace BlazorGame.GameService.Persistence
                 .HasForeignKey(s => s.JoueurId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Score>()
+            modelBuilder.Entity<Score>() // to rm v4 !!
                 .HasOne<Partie>()
                 .WithMany()
-                .HasForeignKey(s => s.PartieId)
+                .HasForeignKey(s => s.PartieId) 
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Donjon>()
