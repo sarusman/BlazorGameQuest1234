@@ -156,11 +156,10 @@
 
 .victory-card.defeat .result-title {
     color: #ff6b6b;
-    text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
 }
 
 .victory-card.defeat .result-subtitle {
-    color: rgba(255, 107, 107, 0.8);
+    color:  #ff6b6b;
 }
 
 @media (max-width: 768px) {

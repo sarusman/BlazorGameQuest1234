@@ -47,23 +47,21 @@ namespace BlazorGame.GameService.Services
               .ToListAsync(ct);
 
         /// <summary>
-        /// Retourne les scores liés à un donjon (via la Partie → DonjonId),
-        /// triés par valeur décroissante puis date.
+        /// Retourne l’unique score final associé à un donjon.
+        /// Comme une partie terminée écrit un seul score final, on renvoie
+        /// le score le plus récent trouvé pour ce donjon (ou null s’il n’y en a pas).
         /// </summary>
         /// <param name="donjonId">Id du donjon.</param>
-        /// <param name="ct">Annulation.</param>
-        /// <returns>Scores du donjon.</returns>
-        public Task<List<object>> GetByDonjonAsync(Guid donjonId, CancellationToken ct) =>
+        /// <returns>Le score final du donjon, ou null.</returns>
+        public Task<Score?> GetByDonjonAsync(Guid donjonId, CancellationToken ct) =>
             _db.Scores.AsNoTracking()
-              .Join(_db.Parties.AsNoTracking(),
+            .Join(_db.Parties.AsNoTracking(),
                     s => s.PartieId,
                     p => p.Id,
                     (s, p) => new { s, p })
-              .Where(x => x.p.DonjonId == donjonId)
-              .OrderByDescending(x => x.s.Valeur)
-              .ThenBy(x => x.s.EnregistreLe)
-              .Select(x => new { x.s.JoueurId, x.s.PartieId, x.s.Valeur, x.s.EnregistreLe })
-              .Cast<object>()
-              .ToListAsync(ct);
+            .Where(x => x.p.DonjonId == donjonId)
+            .OrderByDescending(x => x.s.EnregistreLe)
+            .Select(x => x.s)
+            .FirstOrDefaultAsync(ct);
     }
 }

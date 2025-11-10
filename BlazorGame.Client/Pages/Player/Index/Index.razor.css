@@ -72,6 +72,15 @@
     transform: translateY(-4px) scale(0.98);
     box-shadow: 0 0 20px rgba(255, 107, 0, 0.4), inset 0 0 15px rgba(255, 107, 0, 0.15);
 }
+.credits {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 3;
+    font-size: 0.75rem;
+    color: white;
+    font-style: italic;
+}
 
 .bottom-nav {
     position: absolute;

@@ -40,13 +40,13 @@ namespace BlazorGame.GameService.Controllers
             return Ok(board);
         }
 
-        /// <summary>Scores d’un donjon (triés par valeur décroissante).</summary>
+        /// <summary>Score final d’un donjon.</summary>
         /// <param name="donjonId">Id du donjon.</param>
         [HttpGet("score/{donjonId:guid}")]
-        public async Task<ActionResult<List<object>>> ByDonjon(Guid donjonId, CancellationToken ct)
+        public async Task<ActionResult<Score?>> ByDonjon(Guid donjonId, CancellationToken ct)
         {
-            var list = await _service.GetByDonjonAsync(donjonId, ct);
-            return Ok(list);
+            var score = await _service.GetByDonjonAsync(donjonId, ct);
+            return score is null ? NotFound() : Ok(score);
         }
 
         /// <summary>Payload création score.</summary>
