@@ -85,9 +85,13 @@
                         {
                             <button class="btn-continue" @onclick="AllerSalleSuivante">Continuer →</button>
                         }
+                        else if (EstMort)
+                        {
+                            <button class="btn-finish" @onclick="AllerDefaite">Voir le résultat</button>
+                        }
                         else
                         {
-                            <button class="btn-finish" @onclick="@(() => Nav.NavigateTo($"/donjon/{donjonId}"))">Retour au donjon</button>
+                            <button class="btn-finish" @onclick="AllerVictoire">Voir le résultat</button>
                         }
                     </div>
                 }
@@ -221,7 +225,7 @@
     /// <param name="choix">Choix sélectionné dans la salle.</param>
     private async Task Choisir(Choix choix)
     {
-        if (AChoisi || choix is null || EtatJeu.PartieId is null) return;
+        if (AChoisi || choix is null ||EtatJeu.PartieId is null) return;
 
         try
         {
@@ -261,6 +265,15 @@
         {
             EnChargement = false;
         }
+    }
+    private void AllerVictoire()
+    {
+        Nav.NavigateTo($"/IsVictory/{donjonId}?victory=true");
+    }
+
+    private void AllerDefaite()
+    {
+        Nav.NavigateTo($"/IsVictory/{donjonId}?victory=false");
     }
 
     /// <summary>Va à la salle suivante si le joueur est vivant.</summary>

@@ -1,8 +1,7 @@
 // BlazorGame.GameService/Controllers/ScoresController.cs
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BlazorGame.GameService.Persistence;
 using SharedModels.Domain.Scores;
+using BlazorGame.GameService.Services;
 
 namespace BlazorGame.GameService.Controllers
 {
@@ -11,71 +10,50 @@ namespace BlazorGame.GameService.Controllers
     [Route("api/[controller]")]
     public class ScoresController : ControllerBase
     {
-        private readonly GameDbContext _db;
+        private readonly ScoresService _service;
 
         /// <summary>Construit le contrôleur.</summary>
-        /// <param name="db">DbContext.</param>
-        public ScoresController(GameDbContext db)
-        {
-            _db = db;
-        }
+        /// <param name="service">Service des scores.</param>
+        public ScoresController(ScoresService service) => _service = service;
 
         /// <summary>Crée un score manuel.</summary>
-        /// <param name="request">JoueurId, PartieId, Valeur.</param>
-        /// <param name="ct">Annulation.</param>
-        /// <returns>Score créé.</returns>
         [HttpPost]
         public async Task<ActionResult<Score>> Post([FromBody] ScoreRequest request, CancellationToken ct)
         {
-            var s = new Score
-            {
-                Id = Guid.NewGuid(),
-                JoueurId = request.JoueurId,
-                PartieId = request.PartieId,
-                Valeur = request.Valeur,
-                EnregistreLe = DateTime.UtcNow
-            };
-            await _db.Scores.AddAsync(s, ct);
-            await _db.SaveChangesAsync(ct);
+            var s = await _service.CreateAsync(request.JoueurId, request.PartieId, request.Valeur, ct);
             return Ok(s);
         }
 
         /// <summary>Retourne tous les scores.</summary>
-        /// <param name="ct">Annulation.</param>
-        /// <returns>Liste des scores.</returns>
         [HttpGet]
         public async Task<ActionResult<List<Score>>> GetAll(CancellationToken ct)
         {
-            var list = await _db.Scores.AsNoTracking()
-                .OrderByDescending(x => x.EnregistreLe)
-                .ToListAsync(ct);
+            var list = await _service.GetAllAsync(ct);
             return Ok(list);
         }
 
-        /// <summary>Top 10 par valeur décroissante.</summary>
-        /// <param name="ct">Annulation.</param>
-        /// <returns>Top 10.</returns>
+        /// <summary>Top 10 global.</summary>
         [HttpGet("leaderboard")]
         public async Task<ActionResult<List<object>>> Leaderboard(CancellationToken ct)
         {
-            var list = await _db.Scores.AsNoTracking()
-                .OrderByDescending(s => s.Valeur)
-                .ThenBy(s => s.EnregistreLe)
-                .Take(10)
-                .Select(s => new { s.JoueurId, s.PartieId, s.Valeur, s.EnregistreLe })
-                .ToListAsync(ct);
+            var board = await _service.GetLeaderboardAsync(ct);
+            return Ok(board);
+        }
 
+        /// <summary>Scores d’un donjon (triés par valeur décroissante).</summary>
+        /// <param name="donjonId">Id du donjon.</param>
+        [HttpGet("score/{donjonId:guid}")]
+        public async Task<ActionResult<List<object>>> ByDonjon(Guid donjonId, CancellationToken ct)
+        {
+            var list = await _service.GetByDonjonAsync(donjonId, ct);
             return Ok(list);
         }
 
         /// <summary>Payload création score.</summary>
         public class ScoreRequest
         {
-            /// <summary>Id joueur.</summary>
             public Guid JoueurId { get; set; }
-            /// <summary>Id partie.</summary>
             public Guid PartieId { get; set; }
-            /// <summary>Valeur.</summary>
             public int Valeur { get; set; }
         }
     }

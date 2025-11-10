@@ -17,6 +17,7 @@ builder.Services.AddScoped(typeof(Repository<>));
 builder.Services.AddScoped<GameplayService>();
 builder.Services.AddSingleton<SalleService>();
 builder.Services.AddScoped<DonjonService>();
+builder.Services.AddScoped<ScoresService>();
 builder.Services.AddScoped<PartieService>();
 
 builder.Services.AddCors(o =>
@@ -39,6 +40,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<BlazorGame.GameService.Persistence.GameDbContext>();

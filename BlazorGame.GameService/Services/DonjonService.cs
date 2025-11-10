@@ -85,7 +85,8 @@ namespace BlazorGame.GameService.Services
                .AsNoTracking()
                .FirstOrDefaultAsync(d => d.Id == id, ct);
 
-        /// <summary>Nombre de salles recommandé par difficulté.</summary>
+
+        /// <summary>Nombre de salles par difficulté.</summary>
         /// <param name="d">Difficulté.</param>
         /// <returns>2/3/5.</returns>
         private static int NbParDifficulte(Difficulte d) => d switch
