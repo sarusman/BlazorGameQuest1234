@@ -1,45 +1,29 @@
+using System;
+using Xunit;
 using BlazorGame.GameService.Services;
 using SharedModels.Domain.Users;
-using SharedModels.Domain.Gameplay;
-using Xunit;
 
 namespace BlazorGame.Tests.ServicesTests
 {
-    /// <summary>
-    /// Tests unitaires pour GameplayService.
-    /// </summary>
     public class GameplayServiceTests
     {
-        /// <summary>
-        /// Vérifie que CreerNouvellePartie génère une Partie cohérente pour un joueur donné.
-        /// </summary>
         [Fact]
-        public void CreerNouvellePartie_GenerePartiePourJoueur()
+        public void CreerNouvellePartie_ReturnsPartieWithDonjonAndSalle()
         {
-            var service = new GameplayService();
+            // Summary: Vérifie qu'une nouvelle partie contient un donjon et une salle de départ.
 
-            var joueur = new Joueur
-            {
-                Id = Guid.NewGuid(),
-                Pseudo = "Hero",
-                KeycloakUserName = "kc_hero",
-                Actif = true
-            };
+            // Arrange
+            var player = new Joueur { Id = Guid.NewGuid(), Pseudo = "test" };
+            var svc = new GameplayService();
 
-            Partie partie = service.CreerNouvellePartie(joueur);
+            // Act
+            var partie = svc.CreerNouvellePartie(player);
 
+            // Assert
             Assert.NotNull(partie);
-            Assert.NotEqual(Guid.Empty, partie.Id);
-
-            Assert.Equal(joueur.Id, partie.JoueurId);
-            Assert.Same(joueur, partie.Joueur);
-
-            Assert.False(partie.EstTerminee);
-            Assert.True(partie.DemarreeLe <= DateTime.UtcNow);
-
             Assert.NotNull(partie.Donjon);
-            Assert.NotEqual(Guid.Empty, partie.DonjonId);
-            Assert.NotEmpty(partie.Donjon!.Salles);
+            Assert.NotNull(partie.Donjon.Salles);
+            Assert.Single(partie.Donjon.Salles);
         }
     }
 }

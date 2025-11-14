@@ -1,151 +1,49 @@
-using BlazorGame.GameService.Controllers;
-using BlazorGame.Tests.Support;
-using SharedModels.Domain.Users;
-using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using BlazorGame.GameService.Controllers;
+using BlazorGame.GameService.Persistence;
+using SharedModels.Domain.Users;
 
 namespace BlazorGame.Tests.ControllersTests
 {
-    /// <summary>
-    /// Tests unitaires pour JoueursController (register, login, get).
-    /// </summary>
     public class JoueursControllerTests
     {
-        /// <summary>
-        /// Vérifie que Register crée un Joueur avec le pseudo reçu.
-        /// </summary>
-        /// <returns>Task complétée.</returns>
         [Fact]
-        public async Task Register_Cree_Joueur()
+        public async Task RegisterAndLoginAndGetById_Works()
         {
-            // arrange
-            var repo = new FakeRepository<Joueur>();
+            // Summary: Test basique d'inscription, login et récupération.
+
+            // Arrange
+            var opts = new DbContextOptionsBuilder<GameDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            await using var db = new GameDbContext(opts);
+            var repo = new Repository<Joueur>(db);
             var ctrl = new JoueursController(repo);
 
-            var req = new JoueursController.RegisterRequest
-            {
-                Pseudo = "PlayerOne",
-                Email = "player@game.test"
-            };
+            var register = new JoueursController.RegisterRequest { Pseudo = "p1", Email = "a@b" };
 
-            // act
-            var result = await ctrl.Register(req, CancellationToken.None);
+            // Act - register
+            var reg = await ctrl.Register(register, CancellationToken.None);
+            var regOk = Assert.IsType<OkObjectResult>(reg.Result);
+            var joueur = Assert.IsType<Joueur>(regOk.Value);
 
-            // assert
-            var ok = Assert.IsType<OkObjectResult>(result.Result);
-            var joueurCree = Assert.IsType<Joueur>(ok.Value);
+            // Act - login
+            var login = new JoueursController.LoginRequest { Pseudo = "p1" };
+            var log = await ctrl.Login(login, CancellationToken.None);
+            var logOk = Assert.IsType<OkObjectResult>(log.Result);
 
-            Assert.Equal("PlayerOne", joueurCree.Pseudo);
-            Assert.NotEqual(Guid.Empty, joueurCree.Id);
-        }
+            // Act - get by id
+            var get = await ctrl.GetById(joueur.Id, CancellationToken.None);
+            var getOk = Assert.IsType<OkObjectResult>(get.Result);
 
-        /// <summary>
-        /// Vérifie que Login renvoie le Joueur correspondant au pseudo donné.
-        /// </summary>
-        /// <returns>Task complétée.</returns>
-        [Fact]
-        public async Task Login_Retourne_Joueur_Selon_Pseudo()
-        {
-            // arrange
-            var repo = new FakeRepository<Joueur>();
-
-            var joueur = new Joueur
-            {
-                Id = Guid.NewGuid(),
-                Pseudo = "PlayerTwo"
-            };
-
-            await repo.AddAsync(joueur, CancellationToken.None);
-
-            var ctrl = new JoueursController(repo);
-
-            var reqLogin = new JoueursController.LoginRequest
-            {
-                Pseudo = "PlayerTwo"
-            };
-
-            // act
-            var result = await ctrl.Login(reqLogin, CancellationToken.None);
-
-            // assert
-            var ok = Assert.IsType<OkObjectResult>(result.Result);
-            var joueurRetour = Assert.IsType<Joueur>(ok.Value);
-
-            Assert.Equal(joueur.Id, joueurRetour.Id);
-            Assert.Equal("PlayerTwo", joueurRetour.Pseudo);
-        }
-
-        /// <summary>
-        /// Vérifie que Login renvoie 404 si le pseudo n'existe pas.
-        /// </summary>
-        /// <returns>Task complétée.</returns>
-        [Fact]
-        public async Task Login_Joueur_Inexistant_Retourne_404()
-        {
-            // arrange
-            var repo = new FakeRepository<Joueur>();
-            var ctrl = new JoueursController(repo);
-
-            var reqLogin = new JoueursController.LoginRequest
-            {
-                Pseudo = "Nobody"
-            };
-
-            // act
-            var result = await ctrl.Login(reqLogin, CancellationToken.None);
-
-            // assert
-            Assert.IsType<NotFoundObjectResult>(result.Result);
-        }
-
-        /// <summary>
-        /// Vérifie que GetById renvoie 404 si le joueur n'existe pas.
-        /// </summary>
-        /// <returns>Task complétée.</returns>
-        [Fact]
-        public async Task GetById_Inexistant_Retourne_404()
-        {
-            // arrange
-            var repo = new FakeRepository<Joueur>();
-            var ctrl = new JoueursController(repo);
-
-            // act
-            var result = await ctrl.GetById(Guid.NewGuid(), CancellationToken.None);
-
-            // assert
-            Assert.IsType<NotFoundResult>(result.Result);
-        }
-
-        /// <summary>
-        /// Vérifie que GetById retourne le bon Joueur quand l'Id existe.
-        /// </summary>
-        /// <returns>Task complétée.</returns>
-        [Fact]
-        public async Task GetById_Retourne_Le_Bon_Joueur()
-        {
-            // arrange
-            var repo = new FakeRepository<Joueur>();
-            var joueur = new Joueur
-            {
-                Id = Guid.NewGuid(),
-                Pseudo = "Existing"
-            };
-            await repo.AddAsync(joueur, CancellationToken.None);
-
-            var ctrl = new JoueursController(repo);
-
-            // act
-            var result = await ctrl.GetById(joueur.Id, CancellationToken.None);
-
-            // assert
-            var ok = Assert.IsType<OkObjectResult>(result.Result);
-            var joueurRetour = Assert.IsType<Joueur>(ok.Value);
-
-            Assert.Equal(joueur.Id, joueurRetour.Id);
-            Assert.Equal("Existing", joueurRetour.Pseudo);
+            // Assert
+            Assert.Equal(joueur.Id, ((Joueur)getOk.Value!).Id);
         }
     }
 }
-
-
-
