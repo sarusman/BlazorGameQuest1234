@@ -80,7 +80,7 @@
 
     private async Task Start()
     {
-        var guestId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+        var guestId = Guid.Parse("00000000-0000-0000-0000-000000000001"); // VERSION 4 UTILISATION DE KEAKLOCK
 
         var res = await Http.PostAsJsonAsync("/api/parties", new
         {
