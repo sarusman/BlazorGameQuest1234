@@ -120,15 +120,6 @@ https://github.com/sarusman/BlazorGameQuest1234/actions
 
 * Analyse de la qualité du code grace a  SonarCloud (maintenabilité, duplication, complexité, couverture de tests).
 
-## Diagamme de cas d'utilisation
-
-### Joueur
-<img src=".github/images/image.png" alt="Diagramme Joueur" width="400"/>
-
-
-### Admin (dev)
-<img src=".github/images/image-1.png" alt="Diagramme Admin" width="400"/>
-
 # Comment démarrer le projet
 
 ## 1. Cloner le dépôt
