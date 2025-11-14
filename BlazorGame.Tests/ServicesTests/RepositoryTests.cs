@@ -11,7 +11,6 @@ namespace BlazorGame.Tests.ServicesTests
         [Fact]
         public async Task Add_List_GetById_Work()
         {
-            // Summary: Test basique du Repository generic (Add, List, GetById).
 
             // Arrange
             var opts = new DbContextOptionsBuilder<GameDbContext>()

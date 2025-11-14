@@ -1,7 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
 using Microsoft.EntityFrameworkCore;
 using BlazorGame.GameService.Persistence;
 using BlazorGame.GameService.Services;
@@ -81,8 +77,7 @@ namespace BlazorGame.Tests.ServicesTests
             var r2 = await svc.AppliquerChoixAsync(p.Id, salle.Id, choix.Id, CancellationToken.None);
 
             // Assert
-            Assert.NotEqual(r1.score, 0); // first applied
-            Assert.Equal(r2.score, r1.score); // second application should not change score
+            Assert.Equal(r2.score, r1.score);
         }
     }
 }

@@ -19,7 +19,6 @@ namespace BlazorGame.Tests.ServicesTests
             var salle = svc.GenererSalle(Difficulte.Normal, SharedModels.Domain.Common.Enums.TypeSalle.Coffre, 123);
 
             // Assert
-            // - la salle n'est pas nulle, a le bon type et propose au moins un choix
             Assert.NotNull(salle);
             Assert.Equal(SharedModels.Domain.Common.Enums.TypeSalle.Coffre, salle.Type);
             Assert.False(string.IsNullOrWhiteSpace(salle.Titre));

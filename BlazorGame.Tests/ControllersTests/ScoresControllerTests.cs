@@ -44,3 +44,5 @@ namespace BlazorGame.Tests.ControllersTests
         }
     }
 }
+
+
