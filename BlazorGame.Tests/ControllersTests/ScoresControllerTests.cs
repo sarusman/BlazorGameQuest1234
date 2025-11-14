@@ -42,6 +42,35 @@ namespace BlazorGame.Tests.ControllersTests
 
             Assert.IsType<NotFoundResult>(byDonjon.Result);
         }
+
+        [Fact]
+        public async Task ByDonjon_ReturnsOk_WhenScoreExists()
+        {
+            // Summary: Vérifie que ByDonjon renvoie Ok si un score existe pour le donjon.
+
+            // Arrange
+            var opts = new DbContextOptionsBuilder<GameDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            await using var db = new GameDbContext(opts);
+            var svc = new ScoresService(db);
+            var ctrl = new ScoresController(svc);
+
+            var donjonId = Guid.NewGuid();
+            var partie = new SharedModels.Domain.Gameplay.Partie { Id = Guid.NewGuid(), DonjonId = donjonId, JoueurId = Guid.NewGuid() };
+            await db.Parties.AddAsync(partie, CancellationToken.None);
+            var score = new SharedModels.Domain.Scores.Score { Id = Guid.NewGuid(), PartieId = partie.Id, JoueurId = partie.JoueurId, Valeur = 12, EnregistreLe = DateTime.UtcNow };
+            await db.Scores.AddAsync(score, CancellationToken.None);
+            await db.SaveChangesAsync(CancellationToken.None);
+
+            // Act
+            var byDonjon = await ctrl.ByDonjon(donjonId, CancellationToken.None);
+
+            // Assert
+            var ok = Assert.IsType<OkObjectResult>(byDonjon.Result);
+            Assert.NotNull(ok.Value);
+        }
     }
 }
 

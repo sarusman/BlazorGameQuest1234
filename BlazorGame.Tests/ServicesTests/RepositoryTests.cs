@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ namespace BlazorGame.Tests.ServicesTests
         [Fact]
         public async Task Add_List_GetById_Work()
         {
+            // Summary: Test basique du Repository generic (Add, List, GetById).
 
             // Arrange
             var opts = new DbContextOptionsBuilder<GameDbContext>()
@@ -32,5 +34,22 @@ namespace BlazorGame.Tests.ServicesTests
             Assert.Contains(list, x => x.Id == d.Id);
             Assert.NotNull(byId);
         }
+
+        [Fact]
+        public async Task GetById_ReturnsNull_WhenMissing()
+        {
+            // Summary: Vérifie que GetByIdAsync retourne null si l'entité est absente.
+
+            var opts = new DbContextOptionsBuilder<GameDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            await using var db = new GameDbContext(opts);
+            var repo = new Repository<SharedModels.Domain.Gameplay.Donjon>(db);
+
+            var notFound = await repo.GetByIdAsync(Guid.NewGuid(), CancellationToken.None);
+            Assert.Null(notFound);
+        }
     }
 }
+

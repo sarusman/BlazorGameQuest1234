@@ -52,5 +52,30 @@ namespace BlazorGame.Tests.ControllersTests
             var okChoose = Assert.IsType<OkObjectResult>(chooseRes.Result);
             Assert.NotNull(okChoose.Value);
         }
+
+        [Fact]
+        public async Task Choisir_WithUnknownPartie_ReturnsDefaultResponse()
+        {
+            // Summary: Vérifie le endpoint Choisir renvoie la réponse par défaut si la partie est inconnue.
+
+            // Arrange
+            var opts = new DbContextOptionsBuilder<GameDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            await using var db = new GameDbContext(opts);
+            var svc = new PartieService(db);
+            var ctrl = new PartiesController(svc);
+
+            // Act
+            var req = new PartiesController.ChoisirRequest { SalleId = Guid.NewGuid(), ChoixId = Guid.NewGuid() };
+            var res = await ctrl.Choisir(Guid.NewGuid(), req, CancellationToken.None);
+
+            // Assert
+            var ok = Assert.IsType<OkObjectResult>(res.Result);
+            var payload = Assert.IsType<PartiesController.ChoisirResponse>(ok.Value);
+            Assert.Equal(0, payload.Score);
+            Assert.True(payload.Fini);
+        }
     }
 }
