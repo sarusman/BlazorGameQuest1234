@@ -2,7 +2,7 @@
 # DERNIÈRE ANALYSE SONAR 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sarusman_BlazorGameQuest1234&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=sarusman_BlazorGameQuest1234)
 
-# NOM DES MEMEBRES DU BINOME
+# NOM DES MEMBRES DU BINOME
 Juphil Godwin KANLINSOU
 
 Sarusman SATKUNARAJAH
@@ -43,12 +43,12 @@ Sarusman SATKUNARAJAH
 
   * Choix possible et gain/pertes possible :
 
-### mplitude des effets
+### Amplitude des effets
   * **Facile** -> `6`
-  * **Normal** -> 12`
+  * **Normal** -> `12`
   * **Difficile** -> `scale = 18`
 
-> Les tirages sont aléatoires via `Random.Next(min, max)`.
+> Les tirages sont aléatoires grace a  `Random.Next(min, max)`.
 
 ### Par type de salle
 
@@ -87,7 +87,7 @@ Sarusman SATKUNARAJAH
 | ------- | ------ |
 | Avancer | **0**  |
 
-> Remarque : pour certains choix (ex. **Fouiller** en Combat, **Résoudre** en Énigme, **Ouvrir** en Coffre), le profil **gain/perte/mort** est fixé **au moment de la génération de la salle** (pas au clic), garantissant que tous les joueurs voient la même issue potentielle pour cette salle lors de la partie.
+> Remarque : pour certains choix (ex. **Fouiller** en Combat, **Résoudre** en Énigme, **Ouvrir** en Coffre), le profil **gain/perte/mort** est fixé **au moment de la génération de la salle** (pas au clic).
 
     
 ## IA & outillage
@@ -118,7 +118,7 @@ https://github.com/sarusman/BlazorGameQuest1234/actions
 
 * Exécution des tests unitaires
 
-* Analyse de la qualité du code via SonarCloud (maintenabilité, duplication, complexité, couverture de tests).
+* Analyse de la qualité du code grace a  SonarCloud (maintenabilité, duplication, complexité, couverture de tests).
 
 ## Diagamme de cas d'utilisation
 
