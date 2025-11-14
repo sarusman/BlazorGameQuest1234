@@ -41,10 +41,54 @@ Sarusman SATKUNARAJAH
 
 * **Scores** : à la fin, enregistrement du score final (≥ 0) dans `Scores` → **Leaderboard** = top 10 par score décroissant
 
-* **Tech** : Blazor WASM (client) + ASP.NET Core API (GameService) + EF Core InMemory.
+  * Choix possible et gain/pertes possible :
 
-  * CORS ouvert client→API
-  * Routes SPA gérées côté Nginx
+### mplitude des effets
+  * **Facile** -> `6`
+  * **Normal** -> 12`
+  * **Difficile** -> `scale = 18`
+
+> Les tirages sont aléatoires via `Random.Next(min, max)`.
+
+### Par type de salle
+
+#### Combat
+
+| Choix     | Effets appliqués                                                             |
+| --------- | ------------------------------------------------------------------------------------------------------- |
+| Combattre | **+**[4..scale] (succès) **et** **−**[2..(scale/2+1)] (blessure)                                        |
+| Fuir      | **−**[1..3] (on perd du temps)                                                                          |
+| Fouiller  | **Soit** **+**[4..scale] **soit** **−**[2..(scale/2+1)] (piège) – déterminé à la génération de la salle |
+
+#### Coffre
+
+| Choix   | Effets (au moment de la génération)                                                                       |
+| ------- | --------------------------------------------------------------------------------------------------------- |
+| Ouvrir  | 10% **Mort instantanée** • 45% **+**[scale/2 .. (scale+2)] (trésor) • 45% **−**[scale/2 .. scale] (piège) |
+| Ignorer | **0** (rien)                                                                                              |
+
+#### Énigme
+
+| Choix    | Effets                                                  |
+| -------- | ------------------------------------------------------- |
+| Résoudre | 50% **+**[scale/2 .. scale] • 50% **−**[2..(scale/2+1)] |
+| Fuir     | **−1**                                                  |
+
+#### Repos
+
+| Choix      | Effets      |
+| ---------- | ----------- |
+| Continuer  | **0**       |
+| Se reposer | **+**[2..5] |
+
+#### Piège / Rencontre (cas par défaut)
+
+| Choix   | Effets |
+| ------- | ------ |
+| Avancer | **0**  |
+
+> Remarque : pour certains choix (ex. **Fouiller** en Combat, **Résoudre** en Énigme, **Ouvrir** en Coffre), le profil **gain/perte/mort** est fixé **au moment de la génération de la salle** (pas au clic), garantissant que tous les joueurs voient la même issue potentielle pour cette salle lors de la partie.
+
     
 ## IA & outillage
 
