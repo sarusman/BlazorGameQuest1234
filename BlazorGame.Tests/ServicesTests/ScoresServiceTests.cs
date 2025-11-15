@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -118,6 +119,157 @@ namespace BlazorGame.Tests.ServicesTests
 
             // Assert
             Assert.NotEmpty(board);
+        }
+
+        [Fact]
+        public async Task CreateAsync_CreatesScoreWithCorrectProperties()
+        {
+            // Summary: Vérifie que CreateAsync crée un score avec les propriétés correctes.
+
+            // Arrange
+            var opts = new DbContextOptionsBuilder<GameDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            await using var db = new GameDbContext(opts);
+            var svc = new ScoresService(db);
+            var joueurId = Guid.NewGuid();
+            var partieId = Guid.NewGuid();
+            const int valeur = 42;
+
+            // Act
+            var score = await svc.CreateAsync(joueurId, partieId, valeur, CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(score);
+            Assert.NotEqual(Guid.Empty, score.Id);
+            Assert.Equal(joueurId, score.JoueurId);
+            Assert.Equal(partieId, score.PartieId);
+            Assert.Equal(valeur, score.Valeur);
+            Assert.True(score.EnregistreLe <= DateTime.UtcNow);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_ReturnsScoresInDescendingOrder()
+        {
+            // Summary: Vérifie que GetAllAsync retourne les scores dans l'ordre décroissant par date.
+
+            // Arrange
+            var opts = new DbContextOptionsBuilder<GameDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            await using var db = new GameDbContext(opts);
+            var svc = new ScoresService(db);
+
+            var score1 = new Score { Id = Guid.NewGuid(), JoueurId = Guid.NewGuid(), PartieId = Guid.NewGuid(), Valeur = 10, EnregistreLe = DateTime.UtcNow.AddMinutes(-10) };
+            var score2 = new Score { Id = Guid.NewGuid(), JoueurId = Guid.NewGuid(), PartieId = Guid.NewGuid(), Valeur = 20, EnregistreLe = DateTime.UtcNow.AddMinutes(-5) };
+            var score3 = new Score { Id = Guid.NewGuid(), JoueurId = Guid.NewGuid(), PartieId = Guid.NewGuid(), Valeur = 30, EnregistreLe = DateTime.UtcNow };
+            await db.Scores.AddAsync(score1, CancellationToken.None);
+            await db.Scores.AddAsync(score2, CancellationToken.None);
+            await db.Scores.AddAsync(score3, CancellationToken.None);
+            await db.SaveChangesAsync(CancellationToken.None);
+
+            // Act
+            var all = await svc.GetAllAsync(CancellationToken.None);
+
+            // Assert
+            Assert.Equal(3, all.Count);
+            Assert.Equal(score3.Id, all[0].Id); // Plus récent en premier
+            Assert.Equal(score2.Id, all[1].Id);
+            Assert.Equal(score1.Id, all[2].Id); // Plus ancien en dernier
+        }
+
+        [Fact]
+        public async Task GetLeaderboardAsync_ReturnsTop10()
+        {
+            // Summary: Vérifie que GetLeaderboardAsync retourne au maximum 10 scores.
+
+            // Arrange
+            var opts = new DbContextOptionsBuilder<GameDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            await using var db = new GameDbContext(opts);
+            var svc = new ScoresService(db);
+
+            // Créer 15 scores
+            for (int i = 0; i < 15; i++)
+            {
+                await db.Scores.AddAsync(new Score
+                {
+                    Id = Guid.NewGuid(),
+                    JoueurId = Guid.NewGuid(),
+                    PartieId = Guid.NewGuid(),
+                    Valeur = 100 - i,
+                    EnregistreLe = DateTime.UtcNow.AddMinutes(-i)
+                }, CancellationToken.None);
+            }
+            await db.SaveChangesAsync(CancellationToken.None);
+
+            // Act
+            var board = await svc.GetLeaderboardAsync(CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(board);
+            Assert.True(board.Count <= 10);
+        }
+
+        
+
+        [Fact]
+        public async Task GetByDonjonAsync_ReturnsNull_WhenNoScoreExists()
+        {
+            // Summary: Vérifie que GetByDonjonAsync retourne null quand aucun score n'existe pour le donjon.
+
+            // Arrange
+            var opts = new DbContextOptionsBuilder<GameDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            await using var db = new GameDbContext(opts);
+            var svc = new ScoresService(db);
+            var donjonId = Guid.NewGuid();
+
+            // Act
+            var result = await svc.GetByDonjonAsync(donjonId, CancellationToken.None);
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task GetByDonjonAsync_ReturnsMostRecentScore_WhenMultipleScoresExist()
+        {
+            // Summary: Vérifie que GetByDonjonAsync retourne le score le plus récent quand plusieurs scores existent.
+
+            // Arrange
+            var opts = new DbContextOptionsBuilder<GameDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            await using var db = new GameDbContext(opts);
+            var svc = new ScoresService(db);
+
+            var donjonId = Guid.NewGuid();
+            var partie1 = new Partie { Id = Guid.NewGuid(), DonjonId = donjonId, JoueurId = Guid.NewGuid() };
+            var partie2 = new Partie { Id = Guid.NewGuid(), DonjonId = donjonId, JoueurId = Guid.NewGuid() };
+            await db.Parties.AddAsync(partie1, CancellationToken.None);
+            await db.Parties.AddAsync(partie2, CancellationToken.None);
+
+            var oldScore = new Score { Id = Guid.NewGuid(), PartieId = partie1.Id, JoueurId = partie1.JoueurId, Valeur = 10, EnregistreLe = DateTime.UtcNow.AddHours(-2) };
+            var recentScore = new Score { Id = Guid.NewGuid(), PartieId = partie2.Id, JoueurId = partie2.JoueurId, Valeur = 50, EnregistreLe = DateTime.UtcNow };
+            await db.Scores.AddAsync(oldScore, CancellationToken.None);
+            await db.Scores.AddAsync(recentScore, CancellationToken.None);
+            await db.SaveChangesAsync(CancellationToken.None);
+
+            // Act
+            var result = await svc.GetByDonjonAsync(donjonId, CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(recentScore.Id, result!.Id);
+            Assert.Equal(50, result.Valeur);
         }
     }
 }
