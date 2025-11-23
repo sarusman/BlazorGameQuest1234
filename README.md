@@ -14,6 +14,12 @@ Sarusman SATKUNARAJAH
 `docker compose up --build` <br>
 
 ## URLS : 
+
+## VERSION DEPLOYÉ SUR RENDER :
+- PRODUCTION (branche Prod): https://blazorgamequest1234.onrender.com
+- DEVELOPPEMENT (branche develop): https://blazorgamequest1234-uat.onrender.com 
+
+## VERSION EN LOCAL : 
 - UI (Gateway) : http://localhost:5000
 - Backend swagger (Serveur) : http://localhost:8080/swagger/index.html
 
