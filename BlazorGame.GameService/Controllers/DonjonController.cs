@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using BlazorGame.GameService.Services;
 using SharedModels.Domain.Common.Enums;
 using SharedModels.Domain.Gameplay;
+using SharedModels.Domain.Sealed;
 
 namespace BlazorGame.GameService.Controllers
 {
@@ -55,19 +56,5 @@ namespace BlazorGame.GameService.Controllers
             return d is null ? NotFound() : Ok(d);
         }
 
-        /// <summary>
-        /// Modèle de requête pour la création d'un donjon.
-        /// </summary>
-        public class CreateDonjonRequest
-        {
-            /// <summary>Nom du donjon.</summary>
-            public string? Nom { get; set; }
-            /// <summary>Difficulté globale.</summary>
-            public Difficulte Difficulte { get; set; } = Difficulte.Normal;
-            /// <summary>Nombre de salles.</summary>
-            public int NbSalles { get; set; } = 3;
-            /// <summary>Graine RNG optionnelle.</summary>
-            public int? Seed { get; set; }
-        }
     }
 }

@@ -28,7 +28,7 @@ namespace BlazorGame.Tests.ControllersTests
             var svc = new ScoresService(db);
             var ctrl = new ScoresController(svc);
 
-            var req = new ScoresController.ScoreRequest { JoueurId = Guid.NewGuid(), PartieId = Guid.NewGuid(), Valeur = 10 };
+            var req = new ScoreRequest { JoueurId = Guid.NewGuid(), PartieId = Guid.NewGuid(), Valeur = 10 };
 
             // Act
             var post = await ctrl.Post(req, CancellationToken.None);
@@ -90,7 +90,7 @@ namespace BlazorGame.Tests.ControllersTests
 
             var joueurId = Guid.NewGuid();
             var partieId = Guid.NewGuid();
-            var req = new ScoresController.ScoreRequest { JoueurId = joueurId, PartieId = partieId, Valeur = 25 };
+            var req = new ScoreRequest { JoueurId = joueurId, PartieId = partieId, Valeur = 25 };
 
             // Act
             var post = await ctrl.Post(req, CancellationToken.None);

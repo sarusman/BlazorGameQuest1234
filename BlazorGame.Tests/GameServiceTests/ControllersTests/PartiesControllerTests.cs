@@ -37,7 +37,7 @@ namespace BlazorGame.Tests.ControllersTests
             var svc = new PartieService(db);
             var ctrl = new PartiesController(svc);
 
-            var start = new PartiesController.StartPartieRequest { JoueurId = Guid.NewGuid(), DonjonId = donjon.Id };
+            var start = new StartPartieRequest { JoueurId = Guid.NewGuid(), DonjonId = donjon.Id };
 
             // Act - Demarrer
             var res = await ctrl.Demarrer(start, CancellationToken.None);
@@ -45,7 +45,7 @@ namespace BlazorGame.Tests.ControllersTests
             var partie = Assert.IsType<Partie>(ok.Value);
 
             // Act - Choisir
-            var chooseReq = new PartiesController.ChoisirRequest { SalleId = salle.Id, ChoixId = choix.Id };
+            var chooseReq = new ChoisirRequest { SalleId = salle.Id, ChoixId = choix.Id };
             var chooseRes = await ctrl.Choisir(partie.Id, chooseReq, CancellationToken.None);
 
             // Assert choose
@@ -68,12 +68,12 @@ namespace BlazorGame.Tests.ControllersTests
             var ctrl = new PartiesController(svc);
 
             // Act
-            var req = new PartiesController.ChoisirRequest { SalleId = Guid.NewGuid(), ChoixId = Guid.NewGuid() };
+            var req = new ChoisirRequest { SalleId = Guid.NewGuid(), ChoixId = Guid.NewGuid() };
             var res = await ctrl.Choisir(Guid.NewGuid(), req, CancellationToken.None);
 
             // Assert
             var ok = Assert.IsType<OkObjectResult>(res.Result);
-            var payload = Assert.IsType<PartiesController.ChoisirResponse>(ok.Value);
+            var payload = Assert.IsType<ChoisirResponse>(ok.Value);
             Assert.Equal(0, payload.Score);
             Assert.True(payload.Fini);
         }
@@ -97,7 +97,7 @@ namespace BlazorGame.Tests.ControllersTests
             var svc = new PartieService(db);
             var ctrl = new PartiesController(svc);
             var joueurId = Guid.NewGuid();
-            var start = new PartiesController.StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
+            var start = new StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
 
             // Act
             var res = await ctrl.Demarrer(start, CancellationToken.None);
@@ -130,7 +130,7 @@ namespace BlazorGame.Tests.ControllersTests
             var svc = new PartieService(db);
             var ctrl = new PartiesController(svc);
             var joueurId = Guid.NewGuid();
-            var start = new PartiesController.StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
+            var start = new StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
 
             // Act - première création
             await ctrl.Demarrer(start, CancellationToken.None);
@@ -165,18 +165,18 @@ namespace BlazorGame.Tests.ControllersTests
             var svc = new PartieService(db);
             var ctrl = new PartiesController(svc);
             var joueurId = Guid.NewGuid();
-            var start = new PartiesController.StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
+            var start = new StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
             var startRes = await ctrl.Demarrer(start, CancellationToken.None);
             var partie = Assert.IsType<Partie>(((OkObjectResult)startRes.Result!).Value);
 
-            var chooseReq = new PartiesController.ChoisirRequest { SalleId = salle.Id, ChoixId = choix.Id };
+            var chooseReq = new ChoisirRequest { SalleId = salle.Id, ChoixId = choix.Id };
 
             // Act
             var chooseRes = await ctrl.Choisir(partie.Id, chooseReq, CancellationToken.None);
 
             // Assert
             var ok = Assert.IsType<OkObjectResult>(chooseRes.Result);
-            var response = Assert.IsType<PartiesController.ChoisirResponse>(ok.Value);
+            var response = Assert.IsType<ChoisirResponse>(ok.Value);
             Assert.Equal(25, response.Score); // 10 initial + 15
             Assert.False(response.Mort);
         }
@@ -204,18 +204,18 @@ namespace BlazorGame.Tests.ControllersTests
             var svc = new PartieService(db);
             var ctrl = new PartiesController(svc);
             var joueurId = Guid.NewGuid();
-            var start = new PartiesController.StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
+            var start = new StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
             var startRes = await ctrl.Demarrer(start, CancellationToken.None);
             var partie = Assert.IsType<Partie>(((OkObjectResult)startRes.Result!).Value);
 
-            var chooseReq = new PartiesController.ChoisirRequest { SalleId = salle.Id, ChoixId = choix.Id };
+            var chooseReq = new ChoisirRequest { SalleId = salle.Id, ChoixId = choix.Id };
 
             // Act
             var chooseRes = await ctrl.Choisir(partie.Id, chooseReq, CancellationToken.None);
 
             // Assert
             var ok = Assert.IsType<OkObjectResult>(chooseRes.Result);
-            var response = Assert.IsType<PartiesController.ChoisirResponse>(ok.Value);
+            var response = Assert.IsType<ChoisirResponse>(ok.Value);
             Assert.True(response.Mort);
             Assert.True(response.Fini);
         }
@@ -242,18 +242,18 @@ namespace BlazorGame.Tests.ControllersTests
             var svc = new PartieService(db);
             var ctrl = new PartiesController(svc);
             var joueurId = Guid.NewGuid();
-            var start = new PartiesController.StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
+            var start = new StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
             var startRes = await ctrl.Demarrer(start, CancellationToken.None);
             var partie = Assert.IsType<Partie>(((OkObjectResult)startRes.Result!).Value);
 
-            var chooseReq = new PartiesController.ChoisirRequest { SalleId = salle1.Id, ChoixId = choix1.Id };
+            var chooseReq = new ChoisirRequest { SalleId = salle1.Id, ChoixId = choix1.Id };
 
             // Act
             var chooseRes = await ctrl.Choisir(partie.Id, chooseReq, CancellationToken.None);
 
             // Assert
             var ok = Assert.IsType<OkObjectResult>(chooseRes.Result);
-            var response = Assert.IsType<PartiesController.ChoisirResponse>(ok.Value);
+            var response = Assert.IsType<ChoisirResponse>(ok.Value);
             Assert.NotNull(response.NextSalleId);
             Assert.Equal(salle2.Id, response.NextSalleId);
         }
