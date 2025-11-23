@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS base
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /source
 
 COPY BlazorGameQuest1234.sln .
@@ -11,23 +11,9 @@ RUN dotnet restore BlazorGameQuest1234.sln
 
 COPY . .
 
-FROM base AS build-gameservice
-WORKDIR /source/BlazorGame.GameService
-RUN dotnet publish -c Release -o /app/publish
-
-FROM base AS build-client
 WORKDIR /source/BlazorGame.Client
 RUN dotnet publish -c Release -o /app/publish
 
-
-
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS gameservice
-WORKDIR /app
-COPY --from=build-gameservice /app/publish .
-ENTRYPOINT ["dotnet", "BlazorGame.GameService.dll"]
-
-
-FROM nginx:alpine AS client
-COPY --from=build-client /app/publish/wwwroot /usr/share/nginx/html
+FROM nginx:alpine
+COPY --from=build /app/publish/wwwroot /usr/share/nginx/html
 COPY default.conf /etc/nginx/conf.d/default.conf
-
