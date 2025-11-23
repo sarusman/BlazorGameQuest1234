@@ -123,6 +123,11 @@ Sarusman SATKUNARAJAH
 Vous pouvez aussi lancer : <br>
 `dotnet test`
 
+### Résultats des tests :
+<img width="1321" height="687" alt="Capture d’écran 2025-11-23 à 15 10 17" src="https://github.com/user-attachments/assets/9dd2ddb6-af10-44a9-8099-0ef9b70029e2" />
+#### Coverage : 82%
+
+
 # Version 3 - Cahier des charges
 <img width="705" height="418" alt="Capture d’écran 2025-11-09 à 14 05 38" src="https://github.com/user-attachments/assets/a99d07b3-d7a1-46d8-baf0-44f4312b78db" />
 
