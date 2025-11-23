@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Service backend
   gameservice:
@@ -20,6 +18,6 @@ services:
       dockerfile: Dockerfile
       target: client
     ports:
-      - "5003:80"
+      - "5000:80"
     depends_on:
       - gameservice
