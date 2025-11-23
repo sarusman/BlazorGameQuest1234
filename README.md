@@ -2,79 +2,135 @@
 # DERNIÈRE ANALYSE SONAR 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sarusman_BlazorGameQuest1234&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=sarusman_BlazorGameQuest1234)
 
-# NOM DES MEMEBRES DU BINOME
-Godwin KANLINSOU
+# NOM DES MEMBRES DU BINOME
+Juphil Godwin KANLINSOU
 
-Sarusman SATKUNARAJAH SARUSMAN
+Sarusman SATKUNARAJAH
 
-# Version 1 - Cahier des charges
+# Version 3 - Cahier des charges
 
-## Démmarrage VERSION 1
-`cd BlazorGame.Client`
+## Démarrage VERSION 3
 
-`dotnet build & dotnet run`
+`docker compose up --build` <br>
 
-# Structure du projet & Justification
+## URLS : 
 
-<img src=".github/images/image.png" alt="Lancer client" width="300"/>
+## VERSION DEPLOYÉ SUR RENDER :
+- PRODUCTION (branche Prod): https://blazorgamequest1234.onrender.com
+- DEVELOPPEMENT (branche develop): https://blazorgamequest1234-uat.onrender.com 
 
-## AuthenticationServices
+## VERSION EN LOCAL : 
+- UI (Gateway) : http://localhost:5000
+- Backend swagger (Serveur) : http://localhost:8080/swagger/index.html
 
-Ce service gère l’authentification et la configuration avec Keycloak
-Il permet la connexion, la gestion des rôles (Admin / Joueur).
+(Même IHM)
+<img width="1600" height="1243" alt="hLZDRjj64BxhAHRA8R9XMxOJfqxX6gKeob6YlufoWYBEOIMkPJhKhhfSsb427me41GeKRT6aADgBUsgYOs_jfHUzILwWVeJExbBIIgJi01LjsDHmvfl_cQK-3mNc8ke56U6BWA2hov___lUl7z3gQY70Bna_m3s2rb4fY5uWxpRkzqc0SXNI4H4dA8z6ttQuB-zNLbSpcV2vJ_kOunvguyxpBcSHzM" src="https://github.com/user-attachments/assets/cc60276c-d95c-4d55-8752-a0af412e07d8" />
 
-## BlazorGame.Client
+## Fonctionnement de la version 3 : 
+# Jeu de Donjon Texte Interactif
 
-Projet Blazor WebAssembly (le front-end du jeu).
-Il contient l’interface utilisateur, la page d’accueil, la navigation, et l’affichage des choix pendant l’aventure.
+## Flux de Jeu
 
-## BlazorGame.Core
-La logique métier.
-On y gère la génération des donjons, les calculs de score, les actions possibles du joueur et les règles du jeu.
+### Démarrage
+- **Page d'accueil** → Nouvelle aventure → Génération d'un donjon selon la difficulté
+  - Facile : 2 salles
+  - Normal : 3 salles
+  - Difficile : 5 salles
+  - Toutes les salles sont différentes
 
-## BlazorGame.GameServices
+### Jouer
+- **URL** : `/donjon/{donjonId}`
+- Entrer dans le donjon → Création d'une Partie
+- ⚠️ Impossible de rejouer le même donjon pour le même joueur
 
-Service Web API qui gère la partie “jeu” côté serveur.
-Il expose les endpoints pour les salles, les événements, et la progression des joueurs pendant une partie.
+### Salles
+- **URL** : `/salle/{donjonId}/{idSalle}`
+- Vidéo selon le type (Combat, Coffre, Piège, Énigme, Repos)
+- Un seul choix possible par salle
 
-## BlazorGame.PlayerServices
+## Règles de Base
 
-Il s’occupe des profils, des scores, de l’historique des parties et du classement général.
+**Score**
+- Mis à jour par addition/soustraction d'effets
+- Mort si effet mort instantanée OU score < 0
+- ⚠️ À 0 : encore en vie
 
-## SharedModels
+**Fin du jeu**
+- Mort du joueur
+- OU dernière salle atteinte avec score ≥ 0
 
-Bibliothèque partagée entre tous les projets.
-Elle contient les modèles, les DTOs, les énumérations et les objets utilisés.
+**Leaderboard**
+- Enregistrement du score final (≥ 0) dans les Scores
+- Top 10 par score décroissant
 
-## BlazorGame.Tests
+## Amplitude des Effets
 
-Tous les tests qu'on veut faire dans le projet sont dans le fichier
+| Difficulté | Amplitude |
+|---|---|
+| Facile | 6 |
+| Normal | 12 |
+| Difficile | 18 |
 
-BlazorGame.Tests/UnitTest.cs
+*Les tirages sont aléatoires avec `Random.Next(min, max)`*
 
-lien Github:
-https://github.com/sarusman/BlazorGameQuest1234/blob/Prod/BlazorGame.Tests/UnitTest1.cs
+## Types de Salles et Effets
 
-## Identification de l’ensemble des pages pour le projet.
+### Combat
+| Action | Effet |
+|---|---|
+| Combattre | +[4..scale] et −[2..(scale/2+1)] |
+| Fuir | −[1..3] |
+| Fouiller | +[4..scale] OU −[2..(scale/2+1)]* |
 
-- Pages Client
+### Coffre
+| Action | Effet |
+|---|---|
+| Ouvrir | 10% mort instantanée, 45% +[scale/2..scale+2], 45% −[scale/2..scale] |
+| Ignorer | 0 |
 
-    * Page d’accueil / Connexion
-    * Tableau de bord joueur
-    * Interface de jeu
-    * Fin de partie
-    * Classement / Historique personnel
+### Énigme
+| Action | Effet |
+|---|---|
+| Résoudre | 50% +[scale/2..scale], 50% −[2..(scale/2+1)]* |
+| Fuir | −1 |
 
-- Pages Administrateur
+### Repos
+| Action | Effet |
+|---|---|
+| Continuer | 0 |
+| Se reposer | +[2..5] |
 
-    * Tableau de bord Admin
-    * Historique global
+### Piège / Rencontre (défaut)
+| Action | Effet |
+|---|---|
+| Avancer | 0 |
 
-- Pages d’erreur
+**\*** *Pour Fouiller, Résoudre et Ouvrir : le résultat possible est décidé à la génération de la salle, pas au clic*
 
-    * Erreur 404
-    * Gestion erreur authentification (Keycloak)
-    * Page de configuration
+    
+## IA & outillage
+
+**Vidéos : générées avec Google Veo 3 (boucles MP4).**
+
+**CSS : design initial produit avec Claude AI.** : **Les médias/feuilles de style ont été générés avec l’aide d’IA puis adaptés manuellement**
+
+**Serveur : front servi par Nginx (SPA fallback activé).**
+
+
+## Test VERSION 3
+
+(Automatiquement éxécuté dans le CI : https://github.com/sarusman/BlazorGameQuest1234/actions).
+Vous pouvez aussi lancer : <br>
+`dotnet test`
+
+### Résultats des tests :
+<img width="1321" height="687" alt="Capture d’écran 2025-11-23 à 15 10 17" src="https://github.com/user-attachments/assets/9dd2ddb6-af10-44a9-8099-0ef9b70029e2" />
+**Coverage : 82%**
+
+
+# Version 3 - Cahier des charges
+<img width="705" height="418" alt="Capture d’écran 2025-11-09 à 14 05 38" src="https://github.com/user-attachments/assets/a99d07b3-d7a1-46d8-baf0-44f4312b78db" />
+
 
 ## Mise en place d’une Intégration Continue (CI)
 
@@ -85,53 +141,15 @@ https://github.com/sarusman/BlazorGameQuest1234/actions
 
 * Exécution des tests unitaires
 
-* Analyse de la qualité du code via SonarCloud (maintenabilité, duplication, complexité, couverture de tests).
-
-## Diagamme de cas d'utilisation
-
-### Joueur
-<img src=".github/images/image.png" alt="Diagramme Joueur" width="400"/>
-
-
-### Admin (dev)
-<img src=".github/images/image-1.png" alt="Diagramme Admin" width="400"/>
+* Analyse de la qualité du code grace a  SonarCloud (maintenabilité, duplication, complexité, couverture de tests).
 
 # Comment démarrer le projet
 
 ## 1. Cloner le dépôt
-git clone https://github.com/ton-compte/BlazorGameQuest1234.git
-cd BlazorGameQuest1234
+`git clone https://github.com/sarusman/BlazorGameQuest1234.git`
+`cd BlazorGameQuest1234`
 <img src=".github/images/image-2.png" alt="Cloner dépôt" width="300"/>
 
 
-## 2. Restaurer les dépendances
-dotnet restore
-
-## 3. Compiler la solution
-dotnet build
-
-## 4. Lancer les projets
-
-## 5. Installer xUnit
-dotnet new install xunit.v3.templates
-cd BlazorGame.Tests/
-dotnet build
-dotnet test
-
-### Lancer le client Blazor
-
-<img src=".github/images/image-4.png" alt="Lancer client" width="300"/>
-cd BlazorGame.Client
-dotnet run
-### Accessible sur : http://localhost:5000
-
-### Lancer le service d’authentification
-
-<img src=".github/images/image-5.png" alt="Lancer auth service" width="300"/>
-cd AuthenticationServices
-dotnet run
-### Accessible sur : http://localhost:5001/api/auth
-
-## 5. Urls d'utilisation
-- Joueur : http://localhost:5000
-- Admin : http://localhost:5000/admin
+## 2. Utiliser une image Docker
+`docker compose up --build`

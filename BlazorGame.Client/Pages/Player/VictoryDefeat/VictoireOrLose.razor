@@ -1,0 +1,85 @@
+@page "/IsVictory/{donjonId:guid}"
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<link rel="stylesheet" href="css/victory.css">
+
+<div class="victory-container">
+    <video autoplay muted loop class="background-video">
+        <source src="@GetVideoUrl()" type="video/mp4">
+    </video>
+
+    <div class="victory-content">
+        @if (Loading)
+        {
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Calcul du résultat…</p>
+            </div>
+        }
+        else if (!string.IsNullOrWhiteSpace(Error))
+        {
+            <div class="error-message">@Error</div>
+        }
+        else if (ScoreFinal.HasValue)
+        {
+            <div class="victory-card @(IsVictory ? "victory" : "defeat")">
+                <h1 class="result-title">@(IsVictory ? "VICTOIRE" : "DEFAITE")</h1>
+                <p class="result-subtitle">@(IsVictory ? "Vous avez survécu au donjon !" : "Vous êtes tombé au combat...")</p>
+
+                <div class="final-score">
+                    <h2>Score final</h2>
+                    <div class="score-value">@ScoreFinal.Value pts</div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-retry" @onclick="RetryGame">Recommencer</button>
+                    <button class="btn-home" @onclick="GoHome">Accueil</button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="error-message">Score indisponible.</div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public Guid donjonId { get; set; }
+    [Parameter, SupplyParameterFromQuery(Name = "victory")] public bool IsVictory { get; set; } = true;
+
+    private int? ScoreFinal;
+    private bool Loading;
+    private string Error = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Loading = true;
+        Error = string.Empty;
+
+        try
+        {
+            var dto = await Http.GetFromJsonAsync<ScoreDto?>($"/api/scores/score/{donjonId}");
+            ScoreFinal = dto?.Valeur;
+        }
+        catch (Exception ex)
+        {
+            Error = $"Erreur: {ex.Message}";
+        }
+        finally { Loading = false; }
+    }
+
+    private string GetVideoUrl() => IsVictory ? "/videos/victory-background.mp4" : "/videos/defeat-background.mp4";
+    private void RetryGame() => Nav.NavigateTo("/new-adventure");
+    private void GoHome() => Nav.NavigateTo("/");
+
+    private class ScoreDto
+    {
+        public Guid JoueurId { get; set; }
+        public Guid PartieId { get; set; }
+        public int Valeur { get; set; }
+        public DateTime EnregistreLe { get; set; }
+    }
+}

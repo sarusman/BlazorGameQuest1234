@@ -1,39 +1,79 @@
+using BlazorGame.GameService.Persistence;
+using BlazorGame.GameService.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
+
+builder.Services.AddDbContext<GameDbContext>(options =>
+    options.UseInMemoryDatabase("GameDb")
+);
+
+builder.Services.AddScoped(typeof(Repository<>));
+builder.Services.AddScoped<GameplayService>();
+builder.Services.AddSingleton<SalleService>();
+builder.Services.AddScoped<DonjonService>();
+builder.Services.AddScoped<ScoresService>();
+builder.Services.AddScoped<PartieService>();
+
+builder.Services.AddCors(o =>
+    o.AddPolicy("AllowBlazorClient", p =>
+        p.WithOrigins("http://localhost:5000")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+    )
+);
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "BlazorGame.GameService API",
+        Version = "v1"
+    });
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<BlazorGame.GameService.Persistence.GameDbContext>();
+    db.Database.EnsureCreated();
+
+    var guestId = Guid.Parse("00000000-0000-0000-0000-000000000001"); // pour tester
+    if (!db.Joueurs.Any(j => j.Id == guestId))
+    {
+        db.Joueurs.Add(new SharedModels.Domain.Users.Joueur
+        {
+            Id = guestId,
+            Pseudo = "Guest",
+            KeycloakUserName = "guest",
+            Actif = true
+        });
+        db.SaveChanges();
+    }
+}
+
+
+app.UseStaticFiles();
+app.UseCors("AllowBlazorClient");
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "BlazorGame.GameService API v1");
+    });
 }
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

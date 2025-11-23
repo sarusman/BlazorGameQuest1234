@@ -1,0 +1,302 @@
+@page "/salle/{donjonId:guid}/{idSalle:guid}"
+@using System.Net.Http.Json
+@using SharedModels.Domain.Gameplay
+@using SharedModels.Domain.Common
+@using SharedModels.Domain.Common.Enums
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject BlazorGame.Client.Services.GameState EtatJeu
+
+<link rel="stylesheet" href="/css/salle.css">
+
+<div class="salle-container" data-type="@SalleCourante?.Type.ToString().ToLower()">
+    @if (!string.IsNullOrWhiteSpace(UrlVideo))
+    {
+        <video @key="UrlVideo" class="background-video" autoplay muted loop playsinline preload="auto" src="@UrlVideo"></video>
+    }
+
+    <div class="salle-content">
+        <h2 style="color: white;">Activer le son !</h2>
+        <div class="topbar">
+            <span class="score-badge">Score: <strong>@EtatJeu.Score</strong></span>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Erreur))
+        {
+            <div class="error">@Erreur</div>
+        }
+
+        @if (EnChargement)
+        {
+            <div class="loading-salle">
+                <div class="spinner"></div>
+                <p>Chargement…</p>
+            </div>
+        }
+        else if (DonjonCourant is null || SalleCourante is null)
+        {
+            <div class="error">Erreur de chargement.</div>
+        }
+        else
+        {
+            <div class="salle-card">
+                <h1 class="salle-title">@SalleCourante.Titre</h1>
+                <p class="salle-description">@SalleCourante.Description</p>
+
+                <div class="salle-meta">
+                    <span class="meta-badge">@SalleCourante.Type</span>
+                    <span class="meta-badge">@SalleCourante.Difficulte</span>
+                </div>
+
+                <div class="choices-section">
+                    <h3>Que fais-tu ?</h3>
+                    @if (SalleCourante.ChoixProposes?.Count > 0)
+                    {
+                        <div class="choices-grid">
+                            @foreach (var choix in SalleCourante.ChoixProposes)
+                            {
+                                <button class="choice-btn" disabled="@AChoisi" @onclick="() => Choisir(choix)">
+                                    @choix.Libelle
+                                </button>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="error">Aucun choix disponible.</div>
+                    }
+                </div>
+
+                @if (AChoisi)
+                {
+                    <div class="result-panel">
+                        <div class="result-line">@TexteResultat</div>
+                        @if (EstMort)
+                        {
+                            <div class="result-death">MORT</div>
+                        }
+                        else
+                        {
+                            <div class="result-score">Score: <strong>@EtatJeu.Score</strong></div>
+                        }
+                    </div>
+
+                    <div class="action-buttons">
+                        @if (!EstMort && IdSalleSuivante is not null)
+                        {
+                            <button class="btn-continue" @onclick="AllerSalleSuivante">Continuer →</button>
+                        }
+                        else if (EstMort)
+                        {
+                            <button class="btn-finish" @onclick="AllerDefaite">Voir le résultat</button>
+                        }
+                        else
+                        {
+                            <button class="btn-finish" @onclick="AllerVictoire">Voir le résultat</button>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    /// <summary>Identifiant du donjon courant.</summary>
+    [Parameter] public Guid donjonId { get; set; }
+
+    /// <summary>Identifiant de la salle affichée.</summary>
+    [Parameter] public Guid idSalle { get; set; }
+
+    private string Erreur = string.Empty;
+    private bool EnChargement;
+    private Donjon? DonjonCourant;
+    private Salle? SalleCourante;
+    private Guid? IdSalleSuivante;
+
+    private bool AChoisi;
+    private bool EstMort;
+    private string TexteResultat = string.Empty;
+    private string? UrlVideo;
+
+    /// <summary>
+    /// (Cycle page) Recharge les données dès que la route change.
+    /// </summary>
+    protected override async Task OnParametersSetAsync() => await ChargerAsync();
+
+    /// <summary>
+    /// Orchestration du chargement : reset, fetch, sélection salle, reset score si première, vidéo.
+    /// </summary>
+    private async Task ChargerAsync()
+    {
+        DemarrerChargement();
+
+        try
+        {
+            await RecupererDonjonAsync();
+            if (!DonjonValide()) return;
+
+            SelectionnerSalleEtSuivante();
+            if (SalleCourante is null) return;
+
+            ReinitialiserSiPremiereSalle();
+            DefinirUrlVideo();
+        }
+        catch (Exception ex)
+        {
+            Erreur = $"Erreur: {ex.Message}";
+        }
+        finally
+        {
+            EnChargement =false;
+        }
+    }
+
+    /// <summary>Prépare l’UI avant le chargement.</summary>
+    private void DemarrerChargement()
+    {
+        Erreur = string.Empty;
+        EnChargement = true;
+        AChoisi = false;
+        EstMort = false;
+        TexteResultat = string.Empty;
+        UrlVideo = null;
+        DonjonCourant = null;
+        SalleCourante = null;
+        IdSalleSuivante = null;
+    }
+
+    /// <summary>Appel API pour récupérer le donjon.</summary>
+    private async Task RecupererDonjonAsync()
+    {
+        DonjonCourant = await Http.GetFromJsonAsync<Donjon>($"/api/donjons/{donjonId}");
+    }
+
+    /// <summary>Vérifie que le donjon contient des salles.</summary>
+    private bool DonjonValide()
+    {
+        return DonjonCourant is not null &&
+               DonjonCourant.Salles is not null &&
+               DonjonCourant.Salles.Count > 0;
+    }
+
+    /// <summary>Sélectionne la salle courante et calcule l’identifiant de la suivante.</summary>
+    private void SelectionnerSalleEtSuivante()
+    {
+        var salles = DonjonCourant!.Salles.ToList();
+        SalleCourante = salles.FirstOrDefault(s => s.Id == idSalle);
+
+        if (SalleCourante is null)
+        {
+            Erreur = "Salle introuvable.";
+            return;
+        }
+
+        var index = salles.FindIndex(s => s.Id == idSalle);
+        IdSalleSuivante = (index >= 0 && index + 1 < salles.Count) ? salles[index + 1].Id : null;
+    }
+
+    /// <summary>Réinitialise l’état local si on entre dans la première salle.</summary>
+    private void ReinitialiserSiPremiereSalle()
+    {
+        var premiere = DonjonCourant!.Salles.First().Id;
+        if (SalleCourante!.Id == premiere)
+        {
+            EtatJeu.Reset();
+        }
+    }
+
+    /// <summary>Choisit la vidéo en fonction du type et force un rafraîchissement (cache-busting).</summary>
+    private void DefinirUrlVideo()
+    {
+        var baseUrl = SalleCourante!.Type switch
+        {
+            TypeSalle.Combat => "/videos/combat.mp4",
+            TypeSalle.Coffre => "/videos/coffre.mp4",
+            TypeSalle.Piege => "/videos/pieges.mp4",
+            TypeSalle.Enigme => "/videos/dragon.mp4",
+            _ => "/videos/repos.mp4"
+        };
+        UrlVideo = $"{baseUrl}?v={SalleCourante.Id}";
+    }
+
+    /// <summary>
+    /// Envoie le choix du joueur à l’API, puis met à jour score et état d’écran.
+    /// </summary>
+    /// <param name="choix">Choix sélectionné dans la salle.</param>
+    private async Task Choisir(Choix choix)
+    {
+        if (AChoisi || choix is null ||EtatJeu.PartieId is null) return;
+
+        try
+        {
+            EnChargement = true;
+
+            var reponse = await Http.PostAsJsonAsync($"/api/parties/{EtatJeu.PartieId}/choisir", new
+            {
+                SalleId = idSalle,
+                ChoixId = choix.Id
+            });
+
+            if (!reponse.IsSuccessStatusCode)
+            {
+                Erreur = $"Erreur: {reponse.StatusCode}";
+                return;
+            }
+
+            var resultat = await reponse.Content.ReadFromJsonAsync<ReponseChoisir>();
+            if (resultat is null)
+            {
+                Erreur = "Réponse invalide.";
+                return;
+            }
+
+            EtatJeu.SetScore(resultat.Score);
+            EstMort = resultat.Mort;
+            TexteResultat = EstMort ? "Vous êtes tombé au combat..." : choix.Libelle;
+
+            if (resultat.Fini) EtatJeu.SetFinished();
+            AChoisi = true;
+        }
+        catch (Exception ex)
+        {
+            Erreur = $"Erreur: {ex.Message}";
+        }
+        finally
+        {
+            EnChargement = false;
+        }
+    }
+    private void AllerVictoire()
+    {
+        Nav.NavigateTo($"/IsVictory/{donjonId}?victory=true");
+    }
+
+    private void AllerDefaite()
+    {
+        Nav.NavigateTo($"/IsVictory/{donjonId}?victory=false");
+    }
+
+    /// <summary>Va à la salle suivante si le joueur est vivant.</summary>
+    private void AllerSalleSuivante()
+    {
+        if (IdSalleSuivante is null || EstMort) return;
+        Nav.NavigateTo($"/salle/{donjonId}/{IdSalleSuivante}");
+    }
+
+    /// <summary>DTO réponse minimale de l’API /parties/{id}/choisir.</summary>
+    private class ReponseChoisir
+    {
+        /// <summary>Score courant après application.</summary>
+        public int Score { get; set; }
+        /// <summary>Vrai si mort sur ce choix.</summary>
+        public bool Mort { get; set; }
+        /// <summary>Vrai si la partie est terminée.</summary>
+        public bool Fini { get; set; }
+        /// <summary>Identifiant de la prochaine salle si existante.</summary>
+        public Guid? NextSalleId { get; set; }
+    }
+}
+
+
+

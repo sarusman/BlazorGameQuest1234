@@ -1,0 +1,38 @@
+@page "/new-adventure"
+
+<link rel="stylesheet" href="css/adventure.css">
+
+<div class="adventure-container">
+    <video autoplay muted loop style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;">
+        <source src="/videos/background_select.mp4" type="video/mp4">
+    </video>
+    <div class="background-filter"></div>
+    
+    <div class="content">
+        <div class="levels">
+            <button class="level-btn level-1" @onclick="() => StartLevel(1)">
+                <span class="level-num">1</span>
+                <span class="level-name">Facile</span>
+                <span class="level-desc">Pour les débutants</span>
+            </button>
+            
+            <button class="level-btn level-2" @onclick="() => StartLevel(2)">
+                <span class="level-num">2</span>
+                <span class="level-name">Moyen</span>
+                <span class="level-desc">Pour les guerriers</span>
+            </button>
+            
+            <button class="level-btn level-3" @onclick="() => StartLevel(3)">
+                <span class="level-num">3</span>
+                <span class="level-name">Difficile</span>
+                <span class="level-desc">Pour les légendes</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+@inject NavigationManager Navigation
+
+@code {
+    private void StartLevel(int level) => Navigation.NavigateTo($"/donjonGenerator?level={level}");
+}
