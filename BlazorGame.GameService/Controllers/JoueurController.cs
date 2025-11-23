@@ -74,26 +74,6 @@ namespace BlazorGame.GameService.Controllers
 
             return Ok(joueur);
         }
-
-        /// <summary>
-        /// Modèle pour l'inscription.
-        /// </summary>
-        public class RegisterRequest
-        {
-            /// <summary>Le pseudo choisi par le joueur.</summary>
-            public string Pseudo { get; set; } = string.Empty;
-            /// <summary>Email du joueur.</summary>
-            public string Email { get; set; } = string.Empty;
-        }
-
-        /// <summary>
-        /// Modèle pour la connexion.
-        /// </summary>
-        public class LoginRequest
-        {
-            /// <summary>Pseudo du joueur.</summary>
-            public string Pseudo { get; set; } = string.Empty;
-        }
     }
 }
 

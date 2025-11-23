@@ -26,7 +26,7 @@ namespace BlazorGame.Tests.ControllersTests
             var repo = new Repository<Joueur>(db);
             var ctrl = new JoueursController(repo);
 
-            var register = new JoueursController.RegisterRequest { Pseudo = "p1", Email = "a@b" };
+            var register = new RegisterRequest { Pseudo = "p1", Email = "a@b" };
 
             // Act - register
             var reg = await ctrl.Register(register, CancellationToken.None);
@@ -34,7 +34,7 @@ namespace BlazorGame.Tests.ControllersTests
             var joueur = Assert.IsType<Joueur>(regOk.Value);
 
             // Act - login
-            var login = new JoueursController.LoginRequest { Pseudo = "p1" };
+            var login = new LoginRequest { Pseudo = "p1" };
             var log = await ctrl.Login(login, CancellationToken.None);
             var logOk = Assert.IsType<OkObjectResult>(log.Result);
 
@@ -61,7 +61,7 @@ namespace BlazorGame.Tests.ControllersTests
             var ctrl = new JoueursController(repo);
 
             // Act - login missing
-            var login = new JoueursController.LoginRequest { Pseudo = "nope" };
+            var login = new LoginRequest { Pseudo = "nope" };
             var log = await ctrl.Login(login, CancellationToken.None);
 
             // Assert
@@ -86,7 +86,7 @@ namespace BlazorGame.Tests.ControllersTests
             var repo = new Repository<Joueur>(db);
             var ctrl = new JoueursController(repo);
 
-            var register = new JoueursController.RegisterRequest { Pseudo = "testuser", Email = "test@example.com" };
+            var register = new RegisterRequest { Pseudo = "testuser", Email = "test@example.com" };
 
             // Act
             var reg = await ctrl.Register(register, CancellationToken.None);
@@ -112,8 +112,8 @@ namespace BlazorGame.Tests.ControllersTests
             var repo = new Repository<Joueur>(db);
             var ctrl = new JoueursController(repo);
 
-            var register1 = new JoueursController.RegisterRequest { Pseudo = "user1", Email = "user1@test.com" };
-            var register2 = new JoueursController.RegisterRequest { Pseudo = "user2", Email = "user2@test.com" };
+            var register1 = new RegisterRequest { Pseudo = "user1", Email = "user1@test.com" };
+            var register2 = new RegisterRequest { Pseudo = "user2", Email = "user2@test.com" };
 
             // Act
             var reg1 = await ctrl.Register(register1, CancellationToken.None);
@@ -139,13 +139,13 @@ namespace BlazorGame.Tests.ControllersTests
             var repo = new Repository<Joueur>(db);
             var ctrl = new JoueursController(repo);
 
-            var register1 = new JoueursController.RegisterRequest { Pseudo = "alice", Email = "alice@test.com" };
-            var register2 = new JoueursController.RegisterRequest { Pseudo = "bob", Email = "bob@test.com" };
+            var register1 = new RegisterRequest { Pseudo = "alice", Email = "alice@test.com" };
+            var register2 = new RegisterRequest { Pseudo = "bob", Email = "bob@test.com" };
             await ctrl.Register(register1, CancellationToken.None);
             await ctrl.Register(register2, CancellationToken.None);
 
             // Act
-            var login = new JoueursController.LoginRequest { Pseudo = "alice" };
+            var login = new LoginRequest { Pseudo = "alice" };
             var log = await ctrl.Login(login, CancellationToken.None);
 
             // Assert
@@ -168,7 +168,7 @@ namespace BlazorGame.Tests.ControllersTests
             var repo = new Repository<Joueur>(db);
             var ctrl = new JoueursController(repo);
 
-            var register = new JoueursController.RegisterRequest { Pseudo = "test", Email = "test@test.com" };
+            var register = new RegisterRequest { Pseudo = "test", Email = "test@test.com" };
             var reg = await ctrl.Register(register, CancellationToken.None);
             var joueur = Assert.IsType<Joueur>(((OkObjectResult)reg.Result!).Value);
 

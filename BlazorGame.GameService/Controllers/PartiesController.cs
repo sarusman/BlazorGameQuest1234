@@ -25,23 +25,5 @@ namespace BlazorGame.GameService.Controllers
             var (score, mort, fini, nextSalleId) = await _service.AppliquerChoixAsync(id, request.SalleId, request.ChoixId, ct);
             return Ok(new ChoisirResponse { Score = score, Mort = mort, Fini = fini, NextSalleId = nextSalleId });
         }
-
-        public class StartPartieRequest
-        {
-            public Guid JoueurId { get; set; }
-            public Guid DonjonId { get; set; }
-        }
-        public class ChoisirRequest
-        {
-            public Guid SalleId { get; set; }
-            public Guid ChoixId { get; set; }
-        }
-        public class ChoisirResponse
-        {
-            public int Score { get; set; }
-            public bool Mort { get; set; }
-            public bool Fini { get; set; }
-            public Guid? NextSalleId { get; set; }
-        }
     }
 }

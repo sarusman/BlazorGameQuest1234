@@ -48,13 +48,5 @@ namespace BlazorGame.GameService.Controllers
             var score = await _service.GetByDonjonAsync(donjonId, ct);
             return score is null ? NotFound() : Ok(score);
         }
-
-        /// <summary>Payload création score.</summary>
-        public class ScoreRequest
-        {
-            public Guid JoueurId { get; set; }
-            public Guid PartieId { get; set; }
-            public int Valeur { get; set; }
-        }
     }
 }

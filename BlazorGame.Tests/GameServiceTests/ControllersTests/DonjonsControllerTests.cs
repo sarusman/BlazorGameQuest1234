@@ -8,6 +8,7 @@ using BlazorGame.GameService.Controllers;
 using BlazorGame.GameService.Services;
 using BlazorGame.GameService.Persistence;
 using SharedModels.Domain.Common.Enums;
+using SharedModels.Domain.Sealed;
 
 namespace BlazorGame.Tests.ControllersTests
 {
@@ -29,7 +30,7 @@ namespace BlazorGame.Tests.ControllersTests
             var service = new DonjonService(repo, salleSvc, db);
             var ctrl = new DonjonsController(service);
 
-            var req = new DonjonsController.CreateDonjonRequest { Nom = "X", Difficulte = Difficulte.Normal, NbSalles = 2, Seed = 123 };
+            var req = new CreateDonjonRequest { Nom = "X", Difficulte = Difficulte.Normal, NbSalles = 2, Seed = 123 };
 
             // Act
             var res = await ctrl.Create(req, CancellationToken.None);
@@ -84,7 +85,7 @@ namespace BlazorGame.Tests.ControllersTests
             var service = new DonjonService(repo, salleSvc, db);
             var ctrl = new DonjonsController(service);
 
-            var req = new DonjonsController.CreateDonjonRequest { Nom = "Mon Donjon", Difficulte = Difficulte.Difficile, NbSalles = 5, Seed = 42 };
+            var req = new CreateDonjonRequest { Nom = "Mon Donjon", Difficulte = Difficulte.Difficile, NbSalles = 5, Seed = 42 };
 
             // Act
             var res = await ctrl.Create(req, CancellationToken.None);
@@ -137,7 +138,7 @@ namespace BlazorGame.Tests.ControllersTests
             var service = new DonjonService(repo, salleSvc, db);
             var ctrl = new DonjonsController(service);
 
-            var req = new DonjonsController.CreateDonjonRequest { Nom = null, Difficulte = Difficulte.Normal, NbSalles = 2, Seed = 123 };
+            var req = new CreateDonjonRequest { Nom = null, Difficulte = Difficulte.Normal, NbSalles = 2, Seed = 123 };
 
             // Act
             var res = await ctrl.Create(req, CancellationToken.None);
@@ -164,7 +165,7 @@ namespace BlazorGame.Tests.ControllersTests
             var service = new DonjonService(repo, salleSvc, db);
             var ctrl = new DonjonsController(service);
 
-            var req = new DonjonsController.CreateDonjonRequest { Nom = "Test", Difficulte = Difficulte.Facile, NbSalles = 0, Seed = 1 };
+            var req = new CreateDonjonRequest { Nom = "Test", Difficulte = Difficulte.Facile, NbSalles = 0, Seed = 1 };
 
             // Act
             var res = await ctrl.Create(req, CancellationToken.None);
