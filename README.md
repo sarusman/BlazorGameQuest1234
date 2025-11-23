@@ -21,73 +21,85 @@ Sarusman SATKUNARAJAH
 <img width="1600" height="1243" alt="hLZDRjj64BxhAHRA8R9XMxOJfqxX6gKeob6YlufoWYBEOIMkPJhKhhfSsb427me41GeKRT6aADgBUsgYOs_jfHUzILwWVeJExbBIIgJi01LjsDHmvfl_cQK-3mNc8ke56U6BWA2hov___lUl7z3gQY70Bna_m3s2rb4fY5uWxpRkzqc0SXNI4H4dA8z6ttQuB-zNLbSpcV2vJ_kOunvguyxpBcSHzM" src="https://github.com/user-attachments/assets/cc60276c-d95c-4d55-8752-a0af412e07d8" />
 
 ## Fonctionnement de la version 3 : 
+# Jeu de Donjon Texte Interactif
 
-* **Démarrer** : page d’accueil → **Nouvelle aventure** → génération d’un **donjon** selon la difficulté
+## Flux de Jeu
 
-  * **Facile**: 2 salles · **Normal**: 3 · **Difficile**: 5 (toutes **différentes**)
+### Démarrage
+- **Page d'accueil** → Nouvelle aventure → Génération d'un donjon selon la difficulté
+  - Facile : 2 salles
+  - Normal : 3 salles
+  - Difficile : 5 salles
+  - Toutes les salles sont différentes
 
-* **Jouer** : `/donjon/{donjonId}` → **Entrer** → création d’une **Partie** (on peux pas rejouer le même donjon pour le même joueur)
+### Jouer
+- **URL** : `/donjon/{donjonId}`
+- Entrer dans le donjon → Création d'une Partie
+- ⚠️ Impossible de rejouer le même donjon pour le même joueur
 
-* **Salles** : `/salle/{donjonId}/{idSalle}`
+### Salles
+- **URL** : `/salle/{donjonId}/{idSalle}`
+- Vidéo selon le type (Combat, Coffre, Piège, Énigme, Repos)
+- Un seul choix possible par salle
 
-  * Vidéo d’ambiance selon le type (Combat, Coffre, Piège, Enigme, Repos)
-  * **Un choix** par salle (Combattre, Fuir, Ouvrir, etc.)
+## Règles de Base
 
-* **Règles** :
+**Score**
+- Mis à jour par addition/soustraction d'effets
+- Mort si effet mort instantanée OU score < 0
+- ⚠️ À 0 : encore en vie
 
-  * Score mis à jour par addition/soustraction d’effets
-  * **Mort** si effet mort instantanée ou score < 0 (à 0 : encore en vie)
-  * Fin quand mort ou dernière salle atteinte
+**Fin du jeu**
+- Mort du joueur
+- OU dernière salle atteinte avec score ≥ 0
 
-* **Scores** : à la fin, enregistrement du score final (≥ 0) dans `Scores` → **Leaderboard** = top 10 par score décroissant
+**Leaderboard**
+- Enregistrement du score final (≥ 0) dans les Scores
+- Top 10 par score décroissant
 
-  * Choix possible et gain/pertes possible :
+## Amplitude des Effets
 
-### Amplitude des effets
-  * **Facile** -> `6`
-  * **Normal** -> `12`
-  * **Difficile** -> `scale = 18`
+| Difficulté | Amplitude |
+|---|---|
+| Facile | 6 |
+| Normal | 12 |
+| Difficile | 18 |
 
-> Les tirages sont aléatoires grace a  `Random.Next(min, max)`.
+*Les tirages sont aléatoires avec `Random.Next(min, max)`*
 
-### Par type de salle
+## Types de Salles et Effets
 
-#### Combat
+### Combat
+| Action | Effet |
+|---|---|
+| Combattre | +[4..scale] et −[2..(scale/2+1)] |
+| Fuir | −[1..3] |
+| Fouiller | +[4..scale] OU −[2..(scale/2+1)]* |
 
-| Choix     | Effets appliqués                                                             |
-| --------- | ------------------------------------------------------------------------------------------------------- |
-| Combattre | **+**[4..scale] (succès) **et** **−**[2..(scale/2+1)] (blessure)                                        |
-| Fuir      | **−**[1..3] (on perd du temps)                                                                          |
-| Fouiller  | **Soit** **+**[4..scale] **soit** **−**[2..(scale/2+1)] (piège) – déterminé à la génération de la salle |
+### Coffre
+| Action | Effet |
+|---|---|
+| Ouvrir | 10% mort instantanée, 45% +[scale/2..scale+2], 45% −[scale/2..scale] |
+| Ignorer | 0 |
 
-#### Coffre
+### Énigme
+| Action | Effet |
+|---|---|
+| Résoudre | 50% +[scale/2..scale], 50% −[2..(scale/2+1)]* |
+| Fuir | −1 |
 
-| Choix   | Effets (au moment de la génération)                                                                       |
-| ------- | --------------------------------------------------------------------------------------------------------- |
-| Ouvrir  | 10% **Mort instantanée** • 45% **+**[scale/2 .. (scale+2)] (trésor) • 45% **−**[scale/2 .. scale] (piège) |
-| Ignorer | **0** (rien)                                                                                              |
+### Repos
+| Action | Effet |
+|---|---|
+| Continuer | 0 |
+| Se reposer | +[2..5] |
 
-#### Énigme
+### Piège / Rencontre (défaut)
+| Action | Effet |
+|---|---|
+| Avancer | 0 |
 
-| Choix    | Effets                                                  |
-| -------- | ------------------------------------------------------- |
-| Résoudre | 50% **+**[scale/2 .. scale] • 50% **−**[2..(scale/2+1)] |
-| Fuir     | **−1**                                                  |
-
-#### Repos
-
-| Choix      | Effets      |
-| ---------- | ----------- |
-| Continuer  | **0**       |
-| Se reposer | **+**[2..5] |
-
-#### Piège / Rencontre (cas par défaut)
-
-| Choix   | Effets |
-| ------- | ------ |
-| Avancer | **0**  |
-
-> Remarque : pour certains choix (ex. **Fouiller** en Combat, **Résoudre** en Énigme, **Ouvrir** en Coffre), le profil **gain/perte/mort** est fixé **au moment de la génération de la salle** (pas au clic).
+**\*** *Pour Fouiller, Résoudre et Ouvrir : le résultat possible est décidé à la génération de la salle, pas au clic*
 
     
 ## IA & outillage
