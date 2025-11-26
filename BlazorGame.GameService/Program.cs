@@ -22,7 +22,7 @@ builder.Services.AddScoped<PartieService>();
 
 builder.Services.AddCors(o =>
     o.AddPolicy("AllowBlazorClient", p =>
-        p.WithOrigins("http://localhost:5000")
+        p.WithOrigins("http://localhost:5003")
         .AllowAnyHeader()
         .AllowAnyMethod()
     )

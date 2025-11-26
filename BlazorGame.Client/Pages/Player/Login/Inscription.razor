@@ -1,21 +1,21 @@
-@page "/connexion"
+@page "/inscription"
 @inject HttpClient Http
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 
-<h2>Se connecter</h2>
+<h2>Créer un compte</h2>
 
 @if (!string.IsNullOrWhiteSpace(error)) { <div style="color:#c00">@error</div> }
 
-<input placeholder="Pseudo" @bind="pseudo" style="padding:.5rem;width:260px" />
-<button style="margin-left:.5rem;padding:.5rem 1rem" @onclick="Connecter" disabled="@loading">Se connecter</button>
+<input placeholder="Choisissez un pseudo" @bind="pseudo" style="padding:.5rem;width:260px" />
+<button style="margin-left:.5rem;padding:.5rem 1rem" @onclick="Creer" disabled="@loading">S’inscrire</button>
 
 @code {
     private string pseudo = "";
     private string error = "";
     private bool loading = false;
 
-    private async Task Connecter()
+    private async Task Creer()
     {
         error = "";
         if (string.IsNullOrWhiteSpace(pseudo)) { error = "Entrez un pseudo."; return; }
@@ -23,8 +23,8 @@
         loading = true;
         try
         {
-            var res = await Http.PostAsJsonAsync("/api/joueurs/login", new { Pseudo = pseudo });
-            if (!res.IsSuccessStatusCode) { error = "Pseudo introuvable."; return; }
+            var res = await Http.PostAsJsonAsync("/api/joueurs/register", new { Pseudo = pseudo });
+            if (!res.IsSuccessStatusCode) { error = $"API {res.StatusCode}"; return; }
 
             var j = await res.Content.ReadFromJsonAsync<JoueurDto>();
             if (j is null) { error = "Réponse invalide."; return; }

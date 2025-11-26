@@ -1,1 +1,86 @@
 @page "/history"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<link rel="stylesheet" href="css/history.css">
+
+<div class="history">
+    <h2>Historique des parties</h2>
+    <p>Vos derniers scores enregistrés</p>
+
+    @if (loading)
+    {
+        <p>Chargement…</p>
+    }
+    else if (!string.IsNullOrWhiteSpace(error))
+    {
+        <div class="error">@error</div>
+    }
+    else
+    {
+        @if (items.Count == 0)
+        {
+            <div class="muted">Aucun score enregistré.</div>
+        }
+        else
+        {
+            @foreach (var g in items)
+            {
+                <div class="game @(g.Status.ToLower())">
+                    <div>
+                        <strong>@g.Date</strong> — Score: @g.Score
+                    </div>
+                    <span class="status">@g.Status</span>
+                </div>
+            }
+
+            <div class="stats">
+                <div>Total : @items.Count</div>
+                <div>Victoires : @items.Count(g => g.Status == "Victoire")</div>
+                <div>Meilleur score : @items.Max(g => g.Score)</div>
+            </div>
+        }
+    }
+
+    <button @onclick="GoBack">Retour</button>
+</div>
+
+@code {
+    private List<Row> items = new();
+    private bool loading;
+    private string error = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loading = true;
+        try
+        {
+            var scores = await Http.GetFromJsonAsync<List<ScoreDto>>("/api/scores") ?? new();
+            items = scores
+                .OrderByDescending(s => s.EnregistreLe)
+                .Select(s => new Row(
+                    s.EnregistreLe.ToLocalTime().ToString("yyyy-MM-dd HH:mm"),
+                    s.Valeur,
+                    s.Valeur > 0 ? "Victoire" : "Défaite"
+                ))
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            error = $"Erreur: {ex.Message}";
+        }
+        finally { loading = false; }
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/");
+
+    private record Row(string Date, int Score, string Status);
+
+    private class ScoreDto
+    {
+        public Guid JoueurId { get; set; }
+        public Guid PartieId { get; set; }
+        public int Valeur { get; set; }
+        public DateTime EnregistreLe { get; set; }
+    }
+}
