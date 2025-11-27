@@ -52,6 +52,17 @@ namespace BlazorGame.GameService.Persistence
         {
             return await _db.Set<TEntity>().ToListAsync(ct);
         }
+
+        /// <summary>
+        /// Met à jour une entité existante.
+        /// </summary>
+        /// <param name="entity">Entité à mettre à jour.</param>
+        /// <param name="ct">Token d'annulation.</param>
+        public virtual async Task UpdateAsync(TEntity entity, CancellationToken ct = default)
+        {
+            _db.Set<TEntity>().Update(entity);
+            await _db.SaveChangesAsync(ct);
+        }
     }
 }
 

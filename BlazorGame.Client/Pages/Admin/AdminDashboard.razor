@@ -1,2 +1,142 @@
 @page "/admin/dashboard"
-<h3>Tableau de bord Admin</h3>
+@using SharedModels.Domain.Users
+@inject HttpClient Http
+
+<div class="admin-container">
+    <img src="images/admin-bg.png" alt="Admin Background" class="background-image" />
+    
+    <div class="admin-content">
+        <h3>Tableau de bord Admin</h3>
+
+        @if (joueurs == null)
+        {
+            <p><em>Chargement...</em></p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Pseudo</th>
+                        <th>Email / Keycloak User</th>
+                        <th>Actif</th>
+                        <th>Admin</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var joueur in joueurs)
+                    {
+                        <tr>
+                            <td>@joueur.Pseudo</td>
+                            <td>@joueur.KeycloakUserName</td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="switch-@joueur.Id" checked="@joueur.Actif" @onchange="@(e => ToggleActif(joueur, e))">
+                                    <label class="form-check-label" for="switch-@joueur.Id">@(joueur.Actif ? "Actif" : "Inactif")</label>
+                                </div>
+                            </td>
+                            <td>@(joueur.Admin ? "Oui" : "Non")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <h3 class="mt-5">Scores récents</h3>
+            @if (scores == null)
+            {
+                <p><em>Chargement des scores...</em></p>
+            }
+            else
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Joueur</th>
+                            <th>Score</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var score in scores)
+                        {
+                            <tr>
+                                <td>@(score.Joueur?.Pseudo ?? "Inconnu")</td>
+                                <td>@score.Valeur</td>
+                                <td>@score.EnregistreLe.ToLocalTime().ToString("g")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        }
+    </div>
+</div>
+
+@if (showToast)
+{
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Notification</strong>
+                <button type="button" class="btn-close" @onclick="CloseToast"></button>
+            </div>
+            <div class="toast-body">
+                @toastMessage
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private Joueur[]? joueurs;
+    private SharedModels.Domain.Scores.Score[]? scores;
+    private bool showToast = false;
+    private string toastMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        joueurs = await Http.GetFromJsonAsync<Joueur[]>("api/Joueurs");
+        scores = await Http.GetFromJsonAsync<SharedModels.Domain.Scores.Score[]>("api/Scores");
+    }
+
+    private async Task ToggleActif(Joueur joueur, ChangeEventArgs e)
+    {
+        var actif = (bool)e.Value!;
+        var response = await Http.PutAsJsonAsync($"api/Joueurs/{joueur.Id}/actif", actif);
+        if (response.IsSuccessStatusCode)
+        {
+            joueur.Actif = actif;
+            ShowToast($"Le joueur {joueur.Pseudo} a été {(actif ? "activé" : "désactivé")}.");
+        }
+        else
+        {
+            // En cas d'erreur, on recharge la liste
+            await LoadData();
+            ShowToast("Erreur lors de la mise à jour du statut.");
+        }
+    }
+
+    private void ShowToast(string message)
+    {
+        toastMessage = message;
+        showToast = true;
+        StateHasChanged();
+        
+        // Auto-hide after 3 seconds
+        Task.Delay(3000).ContinueWith(_ => 
+        {
+            showToast = false;
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    private void CloseToast()
+    {
+        showToast = false;
+    }
+}

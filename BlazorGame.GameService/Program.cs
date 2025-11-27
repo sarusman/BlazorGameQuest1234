@@ -56,6 +56,15 @@ using (var scope = app.Services.CreateScope())
             KeycloakUserName = "guest",
             Actif = true
         });
+        //Création du joueur admin
+        db.Joueurs.Add(new SharedModels.Domain.Users.Joueur
+        {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000002"),
+            Pseudo = "Admin",
+            KeycloakUserName = "admin",
+            Actif = true,
+            Admin = true
+        });
         db.SaveChanges();
     }
 }

@@ -55,7 +55,8 @@ namespace BlazorGame.GameService.Controllers
 
             if (joueur == null)
                 return NotFound("Joueur introuvable");
-
+            if(joueur.Actif == false)
+                return NotFound("Joueur désactivé");
             return Ok(joueur);
         }
 
@@ -71,8 +72,39 @@ namespace BlazorGame.GameService.Controllers
             var joueur = await _joueurRepo.GetByIdAsync(id, ct);
             if (joueur == null)
                 return NotFound();
-
+            if(joueur.Actif == false)
+                return NotFound("Joueur désactivé par un admin");
             return Ok(joueur);
+        }
+
+        /// <summary>
+        /// Active ou désactive un joueur.
+        /// </summary>
+        /// <param name="id">Id du joueur.</param>
+        /// <param name="actif">Nouvel état actif.</param>
+        /// <param name="ct">Token d'annulation.</param>
+        /// <returns>Le joueur mis à jour.</returns>
+        [HttpPut("{id:guid}/actif")]
+        public async Task<ActionResult<Joueur>> UpdateActif(Guid id, [FromBody] bool actif, CancellationToken ct)
+        {
+            var joueur = await _joueurRepo.GetByIdAsync(id, ct);
+            if (joueur == null)
+                return NotFound();
+
+            joueur.Actif = actif;
+            await _joueurRepo.UpdateAsync(joueur, ct);
+            return Ok(joueur);
+        }
+
+        /// <summary>
+        /// Retourne la liste des joueurs.
+        /// </summary>
+        /// <param name="ct">Token d'annulation.</param>
+        /// <returns>La liste des joueurs.</returns>
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Joueur>>> ListAsync(CancellationToken ct)
+        {
+            return Ok(await _joueurRepo.ListAsync(ct));
         }
     }
 }

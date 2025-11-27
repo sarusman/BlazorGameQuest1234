@@ -1,0 +1,123 @@
+.admin-container {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px;
+    color: white;
+    overflow-y: auto;
+}
+
+.background-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+.admin-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1200px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+}
+
+h3 {
+    color: #ffd700;
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    text-align: center;
+}
+
+.table {
+    color: white;
+    margin-top: 20px;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+
+.table thead th {
+    border-bottom: 2px solid #ffd700;
+    color: #ffd700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 15px;
+}
+
+.table tbody tr {
+    background: rgba(255, 255, 255, 0.05);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.table tbody tr:hover {
+    transform: scale(1.01);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.table td {
+    padding: 15px;
+    border: none;
+    vertical-align: middle;
+}
+
+.table td:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.table td:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+/* Toggle Switch Styling */
+.form-check-input {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.form-check-input:checked {
+    background-color: #ffd700;
+    border-color: #ffd700;
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);
+}
+
+/* Toast Styling */
+.toast-container {
+    z-index: 1050;
+}
+
+.toast {
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid #ffd700;
+    color: white;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.toast-header {
+    background: rgba(255, 215, 0, 0.1);
+    color: #ffd700;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
