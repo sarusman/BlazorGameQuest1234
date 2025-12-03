@@ -1,6 +1,7 @@
 @page "/history"
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@using SharedModels.Domain.Scores;
 
 <link rel="stylesheet" href="css/history.css">
 
@@ -10,7 +11,7 @@
 
     @if (loading)
     {
-        <p>Chargement…</p>
+        <p>Chargement</p>
     }
     else if (!string.IsNullOrWhiteSpace(error))
     {
@@ -55,7 +56,7 @@
         loading = true;
         try
         {
-            var scores = await Http.GetFromJsonAsync<List<ScoreDto>>("/api/scores") ?? new();
+            var scores = await Http.GetFromJsonAsync<List<Score>>("/api/scores") ?? new();
             items = scores
                 .OrderByDescending(s => s.EnregistreLe)
                 .Select(s => new Row(
@@ -76,11 +77,4 @@
 
     private record Row(string Date, int Score, string Status);
 
-    private class ScoreDto
-    {
-        public Guid JoueurId { get; set; }
-        public Guid PartieId { get; set; }
-        public int Valeur { get; set; }
-        public DateTime EnregistreLe { get; set; }
-    }
 }

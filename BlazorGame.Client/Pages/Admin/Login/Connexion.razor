@@ -1,4 +1,4 @@
-@page "/connexion"
+@page "/admin-connexion"
 @inject HttpClient Http
 @inject NavigationManager Nav
 @inject IJSRuntime JS
@@ -19,11 +19,12 @@
     {
         error = "";
         if (string.IsNullOrWhiteSpace(pseudo)) { error = "Entrez un pseudo."; return; }
+
         loading = true;
         try
         {
-            var res = await Http.PostAsJsonAsync("/api/joueurs/login", new { Pseudo = pseudo });
-            if (!res.IsSuccessStatusCode) { error = "Pseudo introuvable."; return; }
+            var res = await Http.PostAsJsonAsync("/api/admin/login", new { Pseudo = pseudo });
+            if (!res.IsSuccessStatusCode) { error = "Admin introuvable."; return; }
 
             var j = await res.Content.ReadFromJsonAsync<JoueurDto>();
             if (j is null) { error = "Réponse invalide."; return; }
@@ -41,3 +42,4 @@
 
     private class JoueurDto { public Guid Id { get; set; } public string Pseudo { get; set; } = ""; }
 }
+
