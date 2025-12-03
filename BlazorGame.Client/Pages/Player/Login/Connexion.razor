@@ -3,12 +3,33 @@
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 
-<h2>Se connecter</h2>
+<div class="connexion-container">
+    <div class="connexion-card">
+        <h1>Se connecter</h1>
 
-@if (!string.IsNullOrWhiteSpace(error)) { <div style="color:#c00">@error</div> }
+        @if (!string.IsNullOrWhiteSpace(error))
+        {
+            <div class="error-message">@error</div>
+        }
 
-<input placeholder="Pseudo" @bind="pseudo" style="padding:.5rem;width:260px" />
-<button style="margin-left:.5rem;padding:.5rem 1rem" @onclick="Connecter" disabled="@loading">Se connecter</button>
+        <div class="form-group">
+            <input class="input-field"
+                   placeholder="Pseudo"
+                   @bind="pseudo" />
+        </div>
+
+        <button class="btn-connect"
+                @onclick="Connecter"
+                disabled="@loading">
+            @(loading ? "Connexion..." : "Se connecter")
+        </button>
+
+        <p class="footer-text">
+            Pas de compte ?
+            <a href="/inscription">S'inscrire</a>
+        </p>
+    </div>
+</div>
 
 @code {
     private string pseudo = "";

@@ -3,12 +3,33 @@
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 
-<h2>Créer un compte</h2>
+<div class="inscription-container">
+    <div class="inscription-card">
+        <h1>Créer un compte</h1>
 
-@if (!string.IsNullOrWhiteSpace(error)) { <div style="color:#c00">@error</div> }
+        @if (!string.IsNullOrWhiteSpace(error))
+        {
+            <div class="error-message">@error</div>
+        }
 
-<input placeholder="Choisissez un pseudo" @bind="pseudo" style="padding:.5rem;width:260px" />
-<button style="margin-left:.5rem;padding:.5rem 1rem" @onclick="Creer" disabled="@loading">S’inscrire</button>
+        <div class="form-group">
+            <input class="input-field"
+                   placeholder="Choisissez un pseudo"
+                   @bind="pseudo" />
+        </div>
+
+        <button class="btn-register"
+                @onclick="Creer"
+                disabled="@loading">
+            S’inscrire
+        </button>
+
+        <div class="footer-text">
+            Vous avez déjà un compte ?
+            <a href="/connexion">Se connecter</a>
+        </div>
+    </div>
+</div>
 
 @code {
     private string pseudo = "";
@@ -18,7 +39,11 @@
     private async Task Creer()
     {
         error = "";
-        if (string.IsNullOrWhiteSpace(pseudo)) { error = "Entrez un pseudo."; return; }
+        if (string.IsNullOrWhiteSpace(pseudo))
+        {
+            error = "Entrez un pseudo.";
+            return;
+        }
 
         loading = true;
         try
@@ -40,5 +65,9 @@
         finally { loading = false; }
     }
 
-    private class JoueurDto { public Guid Id { get; set; } public string Pseudo { get; set; } = ""; }
+    private class JoueurDto
+    {
+        public Guid Id { get; set; }
+        public string Pseudo { get; set; } = "";
+    }
 }
