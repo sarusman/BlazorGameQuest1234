@@ -31,6 +31,14 @@
     </div>
 </div>
 
+<script>
+  window.setCookie = function (name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days*24*60*60*1000));
+    document.cookie = name + "=" + encodeURIComponent(value) + "; expires=" + d.toUTCString() + "; path=/";
+  };
+</script>
+
 @code {
     private string pseudo = "";
     private string error = "";
@@ -41,6 +49,7 @@
         error = "";
         if (string.IsNullOrWhiteSpace(pseudo)) { error = "Entrez un pseudo."; return; }
         loading = true;
+
         try
         {
             var res = await Http.PostAsJsonAsync("/api/joueurs/login", new { Pseudo = pseudo });
@@ -49,16 +58,24 @@
             var j = await res.Content.ReadFromJsonAsync<JoueurDto>();
             if (j is null) { error = "Réponse invalide."; return; }
 
-            await JS.InvokeVoidAsync("localStorage.setItem", "pseudo", j.Pseudo);
-            await JS.InvokeVoidAsync("localStorage.setItem", "joueurId", j.Id.ToString());
-            await JS.InvokeVoidAsync("eval", $"document.cookie='pseudo={j.Pseudo};path=/;max-age=31536000'");
-            await JS.InvokeVoidAsync("eval", $"document.cookie='joueurId={j.Id};path=/;max-age=31536000'");
+            await JS.InvokeVoidAsync("setCookie", "pseudo", j.Pseudo, 30);
+            await JS.InvokeVoidAsync("setCookie", "joueurId", j.Id.ToString(), 30);
 
             Nav.NavigateTo("/");
         }
-        catch (Exception ex) { error = $"Erreur: {ex.Message}"; }
-        finally { loading = false; }
+        catch (Exception ex)
+        {
+            error = $"Erreur: {ex.Message}";
+        }
+        finally
+        {
+            loading = false;
+        }
     }
 
-    private class JoueurDto { public Guid Id { get; set; } public string Pseudo { get; set; } = ""; }
+    private class JoueurDto
+    {
+        public Guid Id { get; set; }
+        public string Pseudo { get; set; } = "";
+    }
 }

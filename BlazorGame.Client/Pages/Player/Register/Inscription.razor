@@ -59,7 +59,7 @@
             await JS.InvokeVoidAsync("eval", $"document.cookie='pseudo={j.Pseudo};path=/;max-age=31536000'");
             await JS.InvokeVoidAsync("eval", $"document.cookie='joueurId={j.Id};path=/;max-age=31536000'");
 
-            Nav.NavigateTo("/");
+            Nav.NavigateTo("/connexion");
         }
         catch (Exception ex) { error = $"Erreur: {ex.Message}"; }
         finally { loading = false; }
