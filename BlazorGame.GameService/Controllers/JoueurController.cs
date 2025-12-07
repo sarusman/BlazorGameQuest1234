@@ -122,8 +122,4 @@ namespace BlazorGame.GameService.Controllers
         }
     }
 
-    public class RegisterRequest
-    {
-        public string Pseudo { get; set; } = string.Empty;
-    }
 }
