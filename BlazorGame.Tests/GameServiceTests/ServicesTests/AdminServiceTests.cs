@@ -78,7 +78,10 @@ namespace BlazorGame.Tests.GameServiceTests.ServicesTests
                 .Options;
             var db = new GameDbContext(opts);
             // Arrange
-            var score = new SharedModels.Domain.Scores.Score { Id = Guid.NewGuid(), Valeur = 10, EnregistreLe = DateTime.UtcNow };
+            var joueurId = Guid.NewGuid();
+            var joueur = new Joueur { Id = joueurId, Pseudo = "TestUser" };
+            db.Joueurs.Add(joueur);
+            var score = new SharedModels.Domain.Scores.Score { Id = Guid.NewGuid(), JoueurId = joueurId, Valeur = 10, EnregistreLe = DateTime.UtcNow };
             db.Scores.Add(score);
             db.SaveChanges();
             var repo = new Mock<Repository<Joueur>>(db);
