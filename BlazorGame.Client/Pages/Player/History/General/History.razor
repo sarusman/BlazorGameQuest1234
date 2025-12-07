@@ -29,9 +29,18 @@
             {
                 <div class="game @(g.Status.ToLower())">
                     <div>
-                        <strong>@g.Date</strong> — Score: @g.Score
+                        <strong>@g.Date</strong> — <b>@g.Joueur</b> — Score: @g.Score
                     </div>
                     <span class="status">@g.Status</span>
+                    @if (g.Inventaire.Count > 0)
+                    {
+                        <div class="inventaire">Inventaire final :
+                            @foreach (var item in g.Inventaire)
+                            {
+                                <span>@item.Objet (@item.Quantite)</span>
+                            }
+                        </div>
+                    }
                 </div>
             }
 
@@ -56,13 +65,15 @@
         loading = true;
         try
         {
-            var scores = await Http.GetFromJsonAsync<List<Score>>("/api/scores") ?? new();
-            items = scores
-                .OrderByDescending(s => s.EnregistreLe)
+            var history = await Http.GetFromJsonAsync<List<HistoryRow>>("/api/scores/history-full") ?? new();
+            items = history
+                .OrderByDescending(s => s.Date)
                 .Select(s => new Row(
-                    s.EnregistreLe.ToLocalTime().ToString("yyyy-MM-dd HH:mm"),
-                    s.Valeur,
-                    s.Valeur > 0 ? "Victoire" : "Défaite"
+                    s.Date.ToLocalTime().ToString("yyyy-MM-dd HH:mm"),
+                    s.Score,
+                    s.Score > 0 ? "Victoire" : "Défaite",
+                    s.Joueur,
+                    s.Inventaire
                 ))
                 .ToList();
         }
@@ -75,6 +86,17 @@
 
     private void GoBack() => Navigation.NavigateTo("/");
 
-    private record Row(string Date, int Score, string Status);
-
+    private record Row(string Date, int Score, string Status, string Joueur, List<InvItem> Inventaire);
+    private class HistoryRow
+    {
+        public string Joueur { get; set; } = string.Empty;
+        public int Score { get; set; }
+        public DateTime Date { get; set; }
+        public List<InvItem> Inventaire { get; set; } = new();
+    }
+    private class InvItem
+    {
+        public string Objet { get; set; } = string.Empty;
+        public int Quantite { get; set; }
+    }
 }

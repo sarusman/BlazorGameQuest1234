@@ -49,7 +49,16 @@
         try
         {
             var res = await Http.PostAsJsonAsync("/api/joueurs/register", new { Pseudo = pseudo });
-            if (!res.IsSuccessStatusCode) { error = $"API {res.StatusCode}"; return; }
+            if (res.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                error = "Ce pseudo existe déjà. Veuillez en choisir un autre.";
+                return;
+            }
+            if (!res.IsSuccessStatusCode)
+            {
+                error = $"API {res.StatusCode}";
+                return;
+            }
 
             var j = await res.Content.ReadFromJsonAsync<JoueurDto>();
             if (j is null) { error = "Réponse invalide."; return; }

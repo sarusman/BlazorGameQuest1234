@@ -19,6 +19,14 @@ namespace BlazorGame.GameService.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<Joueur>> Register([FromBody] RegisterRequest request, CancellationToken ct)
         {
+            Console.WriteLine($"[REGISTER] Pseudo reçu: '{request.Pseudo}'");
+            var existant = (await _joueurRepo.ListAsync(ct)).FirstOrDefault(j => j.Pseudo == request.Pseudo);
+            if (existant != null)
+            {
+                Console.WriteLine($"[REGISTER] Pseudo déjà existant: '{request.Pseudo}'");
+                return Conflict("Ce pseudo existe déjà. Veuillez en choisir un autre.");
+            }
+
             var joueur = new Joueur
             {
                 Id = Guid.NewGuid(),
@@ -27,6 +35,8 @@ namespace BlazorGame.GameService.Controllers
             };
 
             await _joueurRepo.AddAsync(joueur, ct);
+
+            Console.WriteLine($"Test Id={joueur.Id}, Pseudo='{joueur.Pseudo}'");
 
             Response.Cookies.Append("pseudo", joueur.Pseudo, new CookieOptions
             {
@@ -113,11 +123,6 @@ namespace BlazorGame.GameService.Controllers
     }
 
     public class RegisterRequest
-    {
-        public string Pseudo { get; set; } = string.Empty;
-    }
-
-    public class LoginRequest
     {
         public string Pseudo { get; set; } = string.Empty;
     }

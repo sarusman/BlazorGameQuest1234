@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SharedModels.Domain.Gameplay;
 using SharedModels.Domain.Scores;
 using SharedModels.Domain.Common.Enums;
+using SharedModels.Domain.Items;
 
 namespace BlazorGame.GameService.Services
 {
@@ -100,6 +101,29 @@ namespace BlazorGame.GameService.Services
                     if (ef.Type == TypeEffet.MortInstantanee) mort = true;
                     else if (ef.Type == TypeEffet.GainPoints) delta = delta + ef.Valeur;
                     else if (ef.Type == TypeEffet.PertePoints) delta = delta + ef.Valeur;
+                    else if (ef.Type == TypeEffet.DonnerObjet && !string.IsNullOrWhiteSpace(ef.Donnee))
+                    {
+                        // Ajout d'objet à l'inventaire du joueur
+                        var objet = await _db.Set<Objet>().FirstOrDefaultAsync(o => o.Code == ef.Donnee, ct);
+                        if (objet != null)
+                        {
+                            var inventaire = await _db.Set<InventaireItem>().FirstOrDefaultAsync(ii => ii.JoueurId == p.JoueurId && ii.ObjetId == objet.Id, ct);
+                            if (inventaire != null)
+                            {
+                                inventaire.Quantite += 1;
+                            }
+                            else
+                            {
+                                await _db.Set<InventaireItem>().AddAsync(new InventaireItem
+                                {
+                                    JoueurId = p.JoueurId,
+                                    ObjetId = objet.Id,
+                                    Quantite = 1
+                                }, ct);
+                            }
+                            await _db.SaveChangesAsync(ct);
+                        }
+                    }
                 }
             }
 

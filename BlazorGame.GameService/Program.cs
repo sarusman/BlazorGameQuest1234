@@ -67,8 +67,20 @@ using (var scope = app.Services.CreateScope())
         });
         db.SaveChanges();
     }
+    // creation d'un admin par défaut
+    if (!db.Joueurs.Any(j => j.Pseudo == "admin1234" && j.Admin))
+    {
+        db.Joueurs.Add(new SharedModels.Domain.Users.Joueur
+        {
+            Id = Guid.NewGuid(),
+            Pseudo = "admin1234",
+            KeycloakUserName = "admin1234",
+            Actif = true,
+            Admin = true
+        });
+        db.SaveChanges();
+    }
 }
-
 app.UseStaticFiles();
 app.UseCors("AllowBlazorClient");
 

@@ -8,7 +8,16 @@
 @if (!string.IsNullOrWhiteSpace(error)) { <div style="color:#c00">@error</div> }
 
 <input placeholder="Pseudo" @bind="pseudo" style="padding:.5rem;width:260px" />
+<p>Pour la version 4 (avant keycloak), le pseudo est admin1234</p>
 <button style="margin-left:.5rem;padding:.5rem 1rem" @onclick="Connecter" disabled="@loading">Se connecter</button>
+
+<script>
+  window.setCookie = function (name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days*24*60*60*1000));
+    document.cookie = name + "=" + encodeURIComponent(value) + "; expires=" + d.toUTCString() + "; path=/";
+  };
+</script>
 
 @code {
     private string pseudo = "";
@@ -23,18 +32,16 @@
         loading = true;
         try
         {
-            var res = await Http.PostAsJsonAsync("/api/admin/login", new { Pseudo = pseudo });
+            var res = await Http.PostAsJsonAsync("/api/Admin/login", new { Pseudo = pseudo });
             if (!res.IsSuccessStatusCode) { error = "Admin introuvable."; return; }
 
             var j = await res.Content.ReadFromJsonAsync<JoueurDto>();
             if (j is null) { error = "Réponse invalide."; return; }
 
-            await JS.InvokeVoidAsync("localStorage.setItem", "pseudo", j.Pseudo);
-            await JS.InvokeVoidAsync("localStorage.setItem", "joueurId", j.Id.ToString());
-            await JS.InvokeVoidAsync("eval", $"document.cookie='pseudo={j.Pseudo};path=/;max-age=31536000'");
-            await JS.InvokeVoidAsync("eval", $"document.cookie='joueurId={j.Id};path=/;max-age=31536000'");
+            await JS.InvokeVoidAsync("setCookie", "pseudo", j.Pseudo, 30);
+            await JS.InvokeVoidAsync("setCookie", "joueurId", j.Id.ToString(), 30);
 
-            Nav.NavigateTo("/");
+            Nav.NavigateTo("/admin/dashboard", true);
         }
         catch (Exception ex) { error = $"Erreur: {ex.Message}"; }
         finally { loading = false; }

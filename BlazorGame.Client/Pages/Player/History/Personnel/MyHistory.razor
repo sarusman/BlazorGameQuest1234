@@ -1,0 +1,109 @@
+@page "/my-histo"
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<link rel="stylesheet" href="css/history.css">
+
+<div class="history">
+    <h2>Mon historique de parties</h2>
+    <p>Vos scores et inventaires finaux</p>
+    <div style="font-size:0.9em;color:#888">Pseudo détecté : <b>@pseudo</b></div>
+    <div style="font-size:0.9em;color:#888">Pseudos trouvés dans l'historique : <b>@string.Join(", ", allPseudos)</b></div>
+
+    @if (loading)
+    {
+        <p>Chargement</p>
+    }
+    else if (!string.IsNullOrWhiteSpace(error))
+    {
+        <div class="error">@error</div>
+    }
+    else
+    {
+        @if (items.Count == 0)
+        {
+            <div class="muted">Aucun score enregistré.</div>
+        }
+        else
+        {
+            @foreach (var g in items)
+            {
+                <div class="game @(g.Status.ToLower())">
+                    <div>
+                        <strong>@g.Date</strong> — <b>@g.Joueur</b> — Score: @g.Score
+                    </div>
+                    <span class="status">@g.Status</span>
+                    @if (g.Inventaire.Count > 0)
+                    {
+                        <div class="inventaire">Inventaire final :
+                            @foreach (var item in g.Inventaire)
+                            {
+                                <span>@item.Objet (@item.Quantite)</span>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            <div class="stats">
+                <div>Total : @items.Count</div>
+                <div>Victoires : @items.Count(g => g.Status == "Victoire")</div>
+                <div>Meilleur score : @items.Max(g => g.Score)</div>
+            </div>
+        }
+    }
+
+    <button @onclick="GoBack">Retour</button>
+</div>
+
+@code {
+    private List<Row> items = new();
+    private bool loading;
+    private string error = string.Empty;
+    private string pseudo = "";
+    private List<string> allPseudos = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        loading = true;
+        try
+        {
+            pseudo = await JS.InvokeAsync<string>("eval", "document.cookie.split('; ').find(row => row.startsWith('pseudo='))?.split('=')[1] || ''");
+            var pseudoNorm = (pseudo ?? "").Trim().ToLowerInvariant();
+            var history = await Http.GetFromJsonAsync<List<HistoryRow>>("/api/scores/history-full") ?? new();
+            allPseudos = history.Select(h => h.Joueur).Distinct().OrderBy(x => x).ToList();
+            items = history
+                .Where(s => (s.Joueur ?? "").Trim().ToLowerInvariant() == pseudoNorm)
+                .OrderByDescending(s => s.Date)
+                .Select(s => new Row(
+                    s.Date.ToLocalTime().ToString("yyyy-MM-dd HH:mm"),
+                    s.Score,
+                    s.Score > 0 ? "Victoire" : "Défaite",
+                    s.Joueur,
+                    s.Inventaire
+                ))
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            error = $"Erreur: {ex.Message}";
+        }
+        finally { loading = false; }
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/");
+
+    private record Row(string Date, int Score, string Status, string Joueur, List<InvItem> Inventaire);
+    private class HistoryRow
+    {
+        public string Joueur { get; set; } = string.Empty;
+        public int Score { get; set; }
+        public DateTime Date { get; set; }
+        public List<InvItem> Inventaire { get; set; } = new();
+    }
+    private class InvItem
+    {
+        public string Objet { get; set; } = string.Empty;
+        public int Quantite { get; set; }
+    }
+}

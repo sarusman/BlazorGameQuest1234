@@ -1,90 +1,164 @@
 @page "/admin/dashboard"
 @using SharedModels.Domain.Users
 @inject HttpClient Http
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+@using BlazorGame.Client.Pages.Admin.Models
 
-<div class="admin-container">
-    <img src="images/admin-bg.png" alt="Admin Background" class="background-image" />
-    
-    <div class="admin-content">
-        <h3>Tableau de bord Admin</h3>
+@if (!isAdmin)
+{
+    <div class="admin-container">
+        <h2>Accès refusé</h2>
+        <p>Vous devez être connecté en tant qu'administrateur pour accéder au dashboard.</p>
+        <button class="btn btn-primary" @onclick="GoToLogin">Se connecter admin</button>
+    </div>
+}
+else
+{
+    <div class="admin-container">
+        <img src="images/admin-bg.png" alt="Admin Background" class="background-image" />
+        
+        <div class="admin-content">
+            <h3>Tableau de bord Admin</h3>
 
-        @if (joueurs == null)
-        {
-            <p><em>Chargement...</em></p>
-        }
-        else
-        {
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Pseudo</th>
-                        <th>Email / Keycloak User</th>
-                        <th>Actif</th>
-                        <th>Admin</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var joueur in joueurs)
-                    {
-                        <tr>
-                            <td>@joueur.Pseudo</td>
-                            <td>@joueur.KeycloakUserName</td>
-                            <td>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="switch-@joueur.Id" checked="@joueur.Actif" @onchange="@(e => ToggleActif(joueur, e))">
-                                    <label class="form-check-label" for="switch-@joueur.Id">@(joueur.Actif ? "Actif" : "Inactif")</label>
-                                </div>
-                            </td>
-                            <td>@(joueur.Admin ? "Oui" : "Non")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-            <h3 class="mt-5">Scores récents</h3>
-            @if (scores == null)
+            @if (joueurs == null)
             {
-                <p><em>Chargement des scores...</em></p>
+                <p><em>Chargement...</em></p>
             }
             else
             {
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Joueur</th>
-                            <th>Score</th>
-                            <th>Date</th>
+                            <th>Pseudo</th>
+                            <th>Email / Keycloak User</th>
+                            <th>Actif</th>
+                            <th>Admin</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var score in scores)
+                        @foreach (var joueur in joueurs)
                         {
                             <tr>
-                                <td>@(score.Joueur?.Pseudo ?? "Inconnu")</td>
-                                <td>@score.Valeur</td>
-                                <td>@score.EnregistreLe.ToLocalTime().ToString("g")</td>
+                                <td>@joueur.Pseudo</td>
+                                <td>@joueur.KeycloakUserName</td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="switch-@joueur.Id" checked="@joueur.Actif" @onchange="@(e => ToggleActif(joueur, e))">
+                                        <label class="form-check-label" for="switch-@joueur.Id">@(joueur.Actif ? "Actif" : "Inactif")</label>
+                                    </div>
+                                </td>
+                                <td>@(joueur.Admin ? "Oui" : "Non")</td>
                             </tr>
                         }
                     </tbody>
                 </table>
-            }
-        }
-    </div>
-</div>
 
-@if (showToast)
-{
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <strong class="me-auto">Notification</strong>
-                <button type="button" class="btn-close" @onclick="CloseToast"></button>
-            </div>
-            <div class="toast-body">
-                @toastMessage
-            </div>
+                <h3 class="mt-5">Scores récents</h3>
+                @if (scores == null)
+                {
+                    <p><em>Chargement des scores...</em></p>
+                }
+                else
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Joueur</th>
+                                <th>Score</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var score in scores)
+                            {
+                                <tr>
+                                    <td>@(score.Joueur?.Pseudo ?? "Inconnu")</td>
+                                    <td>@score.Valeur</td>
+                                    <td>@score.EnregistreLe.ToLocalTime().ToString("g")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+
+                <h3 class="mt-5">Classement général</h3>
+                @if (leaderboard == null)
+                {
+                    <p><em>Chargement du classement...</em></p>
+                }
+                else
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Joueur</th>
+                                <th>Score total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var entry in leaderboard)
+                            {
+                                <tr>
+                                    <td>@entry.Pseudo</td>
+                                    <td>@entry.Score</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+
+                <h3 class="mt-5">Liste des parties</h3>
+                @if (parties == null)
+                {
+                    <p><em>Chargement des parties...</em></p>
+                }
+                else
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Joueur</th>
+                                <th>Donjon</th>
+                                <th>Score</th>
+                                <th>Terminé</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var partie in parties)
+                            {
+                                <tr>
+                                    <td>@partie.Id</td>
+                                    <td>@partie.JoueurId</td>
+                                    <td>@partie.DonjonId</td>
+                                    <td>@partie.ScoreFinal</td>
+                                    <td>@(partie.EstTerminee ? "Oui" : "Non")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+
+                <button class="btn btn-primary mt-4" @onclick="ExportJoueurs">Exporter les joueurs (CSV)</button>
+            }
         </div>
     </div>
+
+    @if (showToast)
+    {
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">Notification</strong>
+                    <button type="button" class="btn-close" @onclick="CloseToast"></button>
+                </div>
+                <div class="toast-body">
+                    @toastMessage
+                </div>
+            </div>
+        </div>
+    }
 }
 
 @code {
@@ -92,22 +166,34 @@
     private SharedModels.Domain.Scores.Score[]? scores;
     private bool showToast = false;
     private string toastMessage = string.Empty;
+    private LeaderboardEntry[]? leaderboard;
+    private PartieAdminView[]? parties;
+    private bool isAdmin = false;
 
     protected override async Task OnInitializedAsync()
     {
+        var pseudo = await JS.InvokeAsync<string>("eval", "document.cookie.split('; ').find(row => row.startsWith('pseudo='))?.split('=')[1] || ''");
+        isAdmin = pseudo == "admin1234";
+        if (!isAdmin)
+        {
+            Nav.NavigateTo("/admin-connexion", true);
+            return;
+        }
         await LoadData();
     }
 
     private async Task LoadData()
     {
-        joueurs = await Http.GetFromJsonAsync<Joueur[]>("api/Joueurs");
-        scores = await Http.GetFromJsonAsync<SharedModels.Domain.Scores.Score[]>("api/Scores");
+        joueurs = await Http.GetFromJsonAsync<Joueur[]>("api/Admin/joueurs");
+        scores = await Http.GetFromJsonAsync<SharedModels.Domain.Scores.Score[]>("api/Admin/scores");
+        leaderboard = await Http.GetFromJsonAsync<LeaderboardEntry[]>("api/Admin/leaderboard");
+        parties = await Http.GetFromJsonAsync<PartieAdminView[]>("api/Admin/parties");
     }
 
     private async Task ToggleActif(Joueur joueur, ChangeEventArgs e)
     {
         var actif = (bool)e.Value!;
-        var response = await Http.PutAsJsonAsync($"api/Joueurs/{joueur.Id}/actif", actif);
+        var response = await Http.PutAsJsonAsync($"api/Admin/joueurs/{joueur.Id}/actif", actif);
         if (response.IsSuccessStatusCode)
         {
             joueur.Actif = actif;
@@ -115,10 +201,18 @@
         }
         else
         {
-            // En cas d'erreur, on recharge la liste
             await LoadData();
             ShowToast("Erreur lors de la mise à jour du statut.");
         }
+    }
+
+    private async Task ExportJoueurs()
+    {
+        var csv = await Http.GetStringAsync("api/Admin/export-joueurs");
+        var bytes = System.Text.Encoding.UTF8.GetBytes(csv);
+        var base64 = Convert.ToBase64String(bytes);
+        await JS.InvokeVoidAsync("eval", $"var a = document.createElement('a'); a.href='data:text/csv;base64,{base64}'; a.download='joueurs.csv'; a.click();");
+        ShowToast("Export CSV téléchargé.");
     }
 
     private void ShowToast(string message)
@@ -138,5 +232,10 @@
     private void CloseToast()
     {
         showToast = false;
+    }
+
+    private void GoToLogin()
+    {
+        Nav.NavigateTo("/admin-connexion", true);
     }
 }

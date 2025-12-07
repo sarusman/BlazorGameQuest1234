@@ -4,6 +4,7 @@
 @inject HttpClient Http
 @inject NavigationManager Nav
 @inject BlazorGame.Client.Services.GameState State
+@inject IJSRuntime JS
 
 <link rel="stylesheet" href="css/donjon.css">
 
@@ -80,11 +81,17 @@
 
     private async Task Start()
     {
-        var guestId = Guid.Parse("00000000-0000-0000-0000-000000000001"); // VERSION 4 UTILISATION DE KEAKLOCK
+        // Récupère l'ID du joueur connecté depuis le cookie
+        var joueurIdStr = await JS.InvokeAsync<string>("eval", "(document.cookie.split('; ').find(row => row.startsWith('joueurId='))||'').split('=')[1] || ''");
+        if (string.IsNullOrWhiteSpace(joueurIdStr) || !Guid.TryParse(joueurIdStr, out var joueurId) || joueurId == Guid.Parse("00000000-0000-0000-0000-000000000001"))
+        {
+            Nav.NavigateTo("/connexion");
+            return;
+        }
 
         var res = await Http.PostAsJsonAsync("/api/parties", new
         {
-            JoueurId = guestId,
+            JoueurId = joueurId,
             DonjonId = id
         });
 

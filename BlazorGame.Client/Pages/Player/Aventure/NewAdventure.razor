@@ -31,8 +31,18 @@
     </div>
 </div>
 
+@inject IJSRuntime JS
 @inject NavigationManager Navigation
 
 @code {
+    private string pseudo = "";
+    protected override async Task OnInitializedAsync()
+    {
+        pseudo = await JS.InvokeAsync<string>("eval", "document.cookie.split('; ').find(row => row.startsWith('pseudo='))?.split('=')[1] || ''");
+        if (string.IsNullOrWhiteSpace(pseudo) || pseudo == "admin1234")
+        {
+            Navigation.NavigateTo("/connexion", true);
+        }
+    }
     private void StartLevel(int level) => Navigation.NavigateTo($"/donjonGenerator?level={level}");
 }
