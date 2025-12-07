@@ -125,6 +125,7 @@ namespace BlazorGame.GameService.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Joueur>>> ListAsync(CancellationToken ct)
         {
             return Ok(await _joueurRepo.ListAsync(ct));

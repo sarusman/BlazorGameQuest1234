@@ -23,7 +23,7 @@ builder.Services.AddScoped<PartieService>();
 
 builder.Services.AddCors(o =>
     o.AddPolicy("AllowBlazorClient", p =>
-        p.WithOrigins("https://localhost:5000", "http://localhost:5000")
+        p.WithOrigins("https://localhost:5003", "http://localhost:5003")
          .AllowAnyHeader()
          .AllowAnyMethod()
          .AllowCredentials()
@@ -40,6 +40,15 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1"
     });
 });
+
+builder.Services.AddAuthentication.AddJwtBearer(options =>
+{
+    options.Authority = "http://localhost:8180/realms/gamequest";
+    options.Audience = "gamequest-backend";
+    options.RequireHttpsMetadata = false;
+});
+
+builder.Services.AddAuthorizationBuilder();
 
 var app = builder.Build();
 
