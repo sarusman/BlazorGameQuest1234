@@ -9,9 +9,9 @@ namespace BlazorGame.GameService.Controllers
     [Route("api/[controller]")]
     public class JoueursController : ControllerBase
     {
-        private readonly Repository<Joueur> _joueurRepo;
+    private readonly IRepository<Joueur> _joueurRepo;
 
-        public JoueursController(Repository<Joueur> joueurRepo)
+        public JoueursController(IRepository<Joueur> joueurRepo)
         {
             _joueurRepo = joueurRepo;
         }
@@ -38,22 +38,25 @@ namespace BlazorGame.GameService.Controllers
 
             Console.WriteLine($"Test Id={joueur.Id}, Pseudo='{joueur.Pseudo}'");
 
-            Response.Cookies.Append("pseudo", joueur.Pseudo, new CookieOptions
+            if (Response?.Cookies != null)
             {
-                Path = "/",
-                HttpOnly = false,
-                Secure = true,
-                SameSite = SameSiteMode.None,
-                Expires = DateTimeOffset.UtcNow.AddYears(1)
-            });
-            Response.Cookies.Append("joueurId", joueur.Id.ToString(), new CookieOptions
-            {
-                Path = "/",
-                HttpOnly = false,
-                Secure = true,
-                SameSite = SameSiteMode.None,
-                Expires = DateTimeOffset.UtcNow.AddYears(1)
-            });
+                Response.Cookies.Append("pseudo", joueur.Pseudo, new CookieOptions
+                {
+                    Path = "/",
+                    HttpOnly = false,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTimeOffset.UtcNow.AddYears(1)
+                });
+                Response.Cookies.Append("joueurId", joueur.Id.ToString(), new CookieOptions
+                {
+                    Path = "/",
+                    HttpOnly = false,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTimeOffset.UtcNow.AddYears(1)
+                });
+            }
 
             return Ok(joueur);
         }
@@ -67,22 +70,25 @@ namespace BlazorGame.GameService.Controllers
             if (joueur == null) return NotFound("Joueur introuvable");
             if (!joueur.Actif) return NotFound("Joueur désactivé");
 
-            Response.Cookies.Append("pseudo", joueur.Pseudo, new CookieOptions
+            if (Response?.Cookies != null)
             {
-                Path = "/",
-                HttpOnly = false,
-                Secure = true,
-                SameSite = SameSiteMode.None,
-                Expires = DateTimeOffset.UtcNow.AddYears(1)
-            });
-            Response.Cookies.Append("joueurId", joueur.Id.ToString(), new CookieOptions
-            {
-                Path = "/",
-                HttpOnly = false,
-                Secure = true,
-                SameSite = SameSiteMode.None,
-                Expires = DateTimeOffset.UtcNow.AddYears(1)
-            });
+                Response.Cookies.Append("pseudo", joueur.Pseudo, new CookieOptions
+                {
+                    Path = "/",
+                    HttpOnly = false,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTimeOffset.UtcNow.AddYears(1)
+                });
+                Response.Cookies.Append("joueurId", joueur.Id.ToString(), new CookieOptions
+                {
+                    Path = "/",
+                    HttpOnly = false,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTimeOffset.UtcNow.AddYears(1)
+                });
+            }
 
             return Ok(joueur);
         }
@@ -90,8 +96,11 @@ namespace BlazorGame.GameService.Controllers
         [HttpPost("logout")]
         public IActionResult Logout()
         {
-            Response.Cookies.Delete("pseudo", new CookieOptions { Path = "/", SameSite = SameSiteMode.None, Secure = true });
-            Response.Cookies.Delete("joueurId", new CookieOptions { Path = "/", SameSite = SameSiteMode.None, Secure = true });
+            if (Response?.Cookies != null)
+            {
+                Response.Cookies.Delete("pseudo", new CookieOptions { Path = "/", SameSite = SameSiteMode.None, Secure = true });
+                Response.Cookies.Delete("joueurId", new CookieOptions { Path = "/", SameSite = SameSiteMode.None, Secure = true });
+            }
             return NoContent();
         }
 

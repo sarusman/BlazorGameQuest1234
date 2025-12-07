@@ -3,11 +3,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Moq;
 using BlazorGame.GameService.Controllers;
 using BlazorGame.GameService.Services;
-using BlazorGame.GameService.Persistence;
 using SharedModels.Domain.Gameplay;
+
+using Microsoft.EntityFrameworkCore;
+using BlazorGame.GameService.Persistence;
+
 
 namespace BlazorGame.Tests.ControllersTests
 {
