@@ -6,7 +6,7 @@ namespace BlazorGame.GameService.Persistence
     /// Accès générique lecture/écriture pour une entité EF Core.
     /// </summary>
     /// <typeparam name="TEntity">Type d'entité persistée.</typeparam>
-    public class Repository<TEntity> where TEntity : class
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         private readonly GameDbContext _db;
 

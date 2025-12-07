@@ -12,6 +12,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 builder.Services.AddDbContext<GameDbContext>(options =>
     options.UseInMemoryDatabase("GameDb")
 );
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 builder.Services.AddScoped(typeof(Repository<>));
 builder.Services.AddScoped<GameplayService>();
