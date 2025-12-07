@@ -6,7 +6,7 @@ namespace BlazorGame.GameService.Persistence
     /// Accès générique lecture/écriture pour une entité EF Core.
     /// </summary>
     /// <typeparam name="TEntity">Type d'entité persistée.</typeparam>
-    public class Repository<TEntity> where TEntity : class
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         private readonly GameDbContext _db;
 
@@ -51,6 +51,17 @@ namespace BlazorGame.GameService.Persistence
         public virtual async Task<List<TEntity>> ListAsync(CancellationToken ct = default)
         {
             return await _db.Set<TEntity>().ToListAsync(ct);
+        }
+
+        /// <summary>
+        /// Met à jour une entité existante.
+        /// </summary>
+        /// <param name="entity">Entité à mettre à jour.</param>
+        /// <param name="ct">Token d'annulation.</param>
+        public virtual async Task UpdateAsync(TEntity entity, CancellationToken ct = default)
+        {
+            _db.Set<TEntity>().Update(entity);
+            await _db.SaveChangesAsync(ct);
         }
     }
 }

@@ -1,0 +1,52 @@
+@page "/admin-connexion"
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<h2>Se connecter</h2>
+
+@if (!string.IsNullOrWhiteSpace(error)) { <div style="color:#c00">@error</div> }
+
+<input placeholder="Pseudo" @bind="pseudo" style="padding:.5rem;width:260px" />
+<p>Pour la version 4 (avant keycloak), le pseudo est admin1234</p>
+<button style="margin-left:.5rem;padding:.5rem 1rem" @onclick="Connecter" disabled="@loading">Se connecter</button>
+
+<script>
+  window.setCookie = function (name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days*24*60*60*1000));
+    document.cookie = name + "=" + encodeURIComponent(value) + "; expires=" + d.toUTCString() + "; path=/";
+  };
+</script>
+
+@code {
+    private string pseudo = "";
+    private string error = "";
+    private bool loading = false;
+
+    private async Task Connecter()
+    {
+        error = "";
+        if (string.IsNullOrWhiteSpace(pseudo)) { error = "Entrez un pseudo."; return; }
+
+        loading = true;
+        try
+        {
+            var res = await Http.PostAsJsonAsync("/api/Admin/login", new { Pseudo = pseudo });
+            if (!res.IsSuccessStatusCode) { error = "Admin introuvable."; return; }
+
+            var j = await res.Content.ReadFromJsonAsync<JoueurDto>();
+            if (j is null) { error = "Réponse invalide."; return; }
+
+            await JS.InvokeVoidAsync("setCookie", "pseudo", j.Pseudo, 30);
+            await JS.InvokeVoidAsync("setCookie", "joueurId", j.Id.ToString(), 30);
+
+            Nav.NavigateTo("/admin/dashboard", true);
+        }
+        catch (Exception ex) { error = $"Erreur: {ex.Message}"; }
+        finally { loading = false; }
+    }
+
+    private class JoueurDto { public Guid Id { get; set; } public string Pseudo { get; set; } = ""; }
+}
+

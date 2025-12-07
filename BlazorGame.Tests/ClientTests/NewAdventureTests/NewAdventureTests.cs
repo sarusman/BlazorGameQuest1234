@@ -7,13 +7,16 @@ using BlazorGame.Client.Pages.Player.Aventure;
 
 namespace BlazorGame.Tests.ClientTests.NewAdventureTests
 {
-    public class NewAdventureTests
+    public class NewAdventureTests : Bunit.BunitContext
     {
+        public NewAdventureTests()
+        {
+            this.JSInterop.Setup<string>("eval", _ => true).SetResult("testpseudo");
+        }
         [Fact]
         public void RendersLevelButtons()
         {
-            using var ctx = new Bunit.BunitContext();
-            var cut = ctx.Render<NewAdventure>();
+            var cut = this.Render<NewAdventure>();
             Assert.Contains("Facile", cut.Markup);
             Assert.Contains("Moyen", cut.Markup);
             Assert.Contains("Difficile", cut.Markup);
@@ -22,9 +25,8 @@ namespace BlazorGame.Tests.ClientTests.NewAdventureTests
         [Fact]
         public void ClickingLevelNavigatesToGenerator()
         {
-            using var ctx = new Bunit.BunitContext();
-            var nav = ctx.Services.GetRequiredService<NavigationManager>();
-            var cut = ctx.Render<NewAdventure>();
+            var nav = this.Services.GetRequiredService<NavigationManager>();
+            var cut = this.Render<NewAdventure>();
 
             var btn1 = cut.Find(".level-1");
             btn1.Click();

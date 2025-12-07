@@ -17,7 +17,7 @@ namespace BlazorGame.Tests.ClientTests
 {
     public class DonjonViewTests
     {
-        private class FakeHandler : HttpMessageHandler
+        public class FakeHandler : HttpMessageHandler
         {
             private readonly Func<HttpRequestMessage, HttpResponseMessage> _responder;
             public FakeHandler(Func<HttpRequestMessage, HttpResponseMessage> responder) => _responder = responder;
@@ -29,6 +29,7 @@ namespace BlazorGame.Tests.ClientTests
         {
             var donjonId = Guid.NewGuid();
             var salleId = Guid.NewGuid();
+            var joueurId = Guid.NewGuid().ToString();
             var donjon = new Donjon
             {
                 Id = donjonId,
@@ -46,6 +47,7 @@ namespace BlazorGame.Tests.ClientTests
             });
 
             using var ctx = new Bunit.BunitContext();
+            ctx.JSInterop.Setup<string>("eval", _ => true).SetResult(joueurId);
             ctx.Services.AddSingleton(new HttpClient(fakeHandler) { BaseAddress = new Uri("http://localhost") });
             ctx.Services.AddSingleton<GameState>();
 

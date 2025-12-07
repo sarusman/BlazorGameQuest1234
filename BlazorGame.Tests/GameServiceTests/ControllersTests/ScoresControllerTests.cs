@@ -196,9 +196,16 @@ namespace BlazorGame.Tests.ControllersTests
             var svc = new ScoresService(db);
             var ctrl = new ScoresController(svc);
 
-            await svc.CreateAsync(Guid.NewGuid(), Guid.NewGuid(), 50, CancellationToken.None);
-            await svc.CreateAsync(Guid.NewGuid(), Guid.NewGuid(), 100, CancellationToken.None);
-            await svc.CreateAsync(Guid.NewGuid(), Guid.NewGuid(), 75, CancellationToken.None);
+            var joueurId1 = Guid.NewGuid();
+            var joueurId2 = Guid.NewGuid();
+            var joueurId3 = Guid.NewGuid();
+            db.Joueurs.Add(new SharedModels.Domain.Users.Joueur { Id = joueurId1, Pseudo = "User1" });
+            db.Joueurs.Add(new SharedModels.Domain.Users.Joueur { Id = joueurId2, Pseudo = "User2" });
+            db.Joueurs.Add(new SharedModels.Domain.Users.Joueur { Id = joueurId3, Pseudo = "User3" });
+            await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+            await svc.CreateAsync(joueurId1, Guid.NewGuid(), 50, CancellationToken.None);
+            await svc.CreateAsync(joueurId2, Guid.NewGuid(), 100, CancellationToken.None);
+            await svc.CreateAsync(joueurId3, Guid.NewGuid(), 75, CancellationToken.None);
 
             // Act
             var leaderboard = await ctrl.Leaderboard(CancellationToken.None);

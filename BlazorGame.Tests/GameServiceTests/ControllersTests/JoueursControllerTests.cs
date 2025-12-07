@@ -1,185 +1,151 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Moq;
 using BlazorGame.GameService.Controllers;
-using BlazorGame.GameService.Persistence;
 using SharedModels.Domain.Users;
+using BlazorGame.GameService.Persistence;
 
-namespace BlazorGame.Tests.ControllersTests
+namespace BlazorGame.Tests.GameServiceTests.ControllersTests
 {
     public class JoueursControllerTests
     {
         [Fact]
-        public async Task RegisterAndLoginAndGetById_Works()
+        public async Task Register_ReturnsConflictIfPseudoExists()
         {
-            // Summary: Test basique d'inscription, login et récupération.
-
-            // Arrange
-            var opts = new DbContextOptionsBuilder<GameDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
-
-            await using var db = new GameDbContext(opts);
-            var repo = new Repository<Joueur>(db);
-            var ctrl = new JoueursController(repo);
-
-            var register = new RegisterRequest { Pseudo = "p1", Email = "a@b" };
-
-            // Act - register
-            var reg = await ctrl.Register(register, CancellationToken.None);
-            var regOk = Assert.IsType<OkObjectResult>(reg.Result);
-            var joueur = Assert.IsType<Joueur>(regOk.Value);
-
-            // Act - login
-            var login = new LoginRequest { Pseudo = "p1" };
-            var log = await ctrl.Login(login, CancellationToken.None);
-            var logOk = Assert.IsType<OkObjectResult>(log.Result);
-
-            // Act - get by id
-            var get = await ctrl.GetById(joueur.Id, CancellationToken.None);
-            var getOk = Assert.IsType<OkObjectResult>(get.Result);
-
-            // Assert
-            Assert.Equal(joueur.Id, ((Joueur)getOk.Value!).Id);
+            var repo = new Mock<IRepository<Joueur>>();
+            repo.Setup(r => r.ListAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Joueur> { new Joueur { Pseudo = "dup" } });
+                var ctrl = new JoueursController(repo.Object);
+            var req = new RegisterRequest { Pseudo = "dup" };
+            var result = await ctrl.Register(req, CancellationToken.None);
+            var conflict = Assert.IsType<ConflictObjectResult>(result.Result);
+            Assert.Contains("existe déjà", conflict.Value.ToString());
         }
 
         [Fact]
-        public async Task Login_NotFound_Returns404_And_GetById_NotFound()
+        public async Task Register_ReturnsOkIfNewPseudo()
         {
-            // Summary: Vérifie que Login et GetById retournent NotFound quand l'entité n'existe pas.
-
-            // Arrange
-            var opts = new DbContextOptionsBuilder<GameDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
-
-            await using var db = new GameDbContext(opts);
-            var repo = new Repository<Joueur>(db);
-            var ctrl = new JoueursController(repo);
-
-            // Act - login missing
-            var login = new LoginRequest { Pseudo = "nope" };
-            var log = await ctrl.Login(login, CancellationToken.None);
-
-            // Assert
-            Assert.IsType<NotFoundObjectResult>(log.Result);
-
-            // Act - get by id missing
-            var get = await ctrl.GetById(Guid.NewGuid(), CancellationToken.None);
-            Assert.IsType<NotFoundResult>(get.Result);
+            var repo = new Mock<IRepository<Joueur>>();
+            repo.Setup(r => r.ListAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Joueur>());
+            repo.Setup(r => r.AddAsync(It.IsAny<Joueur>(), It.IsAny<CancellationToken>())).ReturnsAsync((Joueur j, CancellationToken ct) => j);
+                var ctrl = new JoueursController(repo.Object);
+            var req = new RegisterRequest { Pseudo = "newuser" };
+            var result = await ctrl.Register(req, CancellationToken.None);
+            var ok = Assert.IsType<OkObjectResult>(result.Result);
+            var joueur = Assert.IsType<Joueur>(ok.Value);
+            Assert.Equal("newuser", joueur.Pseudo);
         }
 
         [Fact]
-        public async Task Register_CreatesJoueurWithCorrectProperties()
+        public async Task Login_ReturnsNotFoundIfMissing()
         {
-            // Summary: Vérifie que Register crée un joueur avec les propriétés correctes.
-
-            // Arrange
-            var opts = new DbContextOptionsBuilder<GameDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
-
-            await using var db = new GameDbContext(opts);
-            var repo = new Repository<Joueur>(db);
-            var ctrl = new JoueursController(repo);
-
-            var register = new RegisterRequest { Pseudo = "testuser", Email = "test@example.com" };
-
-            // Act
-            var reg = await ctrl.Register(register, CancellationToken.None);
-
-            // Assert
-            var regOk = Assert.IsType<OkObjectResult>(reg.Result);
-            var joueur = Assert.IsType<Joueur>(regOk.Value);
-            Assert.Equal("testuser", joueur.Pseudo);
-            Assert.NotEqual(Guid.Empty, joueur.Id);
+            var repo = new Mock<IRepository<Joueur>>();
+            repo.Setup(r => r.ListAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Joueur>());
+                var ctrl = new JoueursController(repo.Object);
+            var req = new LoginRequest { Pseudo = "absent" };
+            var result = await ctrl.Login(req, CancellationToken.None);
+            var notFound = Assert.IsType<NotFoundObjectResult>(result.Result);
+            Assert.Contains("introuvable", notFound.Value.ToString());
         }
 
         [Fact]
-        public async Task Register_GeneratesUniqueId()
+        public async Task Login_ReturnsOkIfActive()
         {
-            // Summary: Vérifie que Register génère un Id unique pour chaque joueur.
-
-            // Arrange
-            var opts = new DbContextOptionsBuilder<GameDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
-
-            await using var db = new GameDbContext(opts);
-            var repo = new Repository<Joueur>(db);
-            var ctrl = new JoueursController(repo);
-
-            var register1 = new RegisterRequest { Pseudo = "user1", Email = "user1@test.com" };
-            var register2 = new RegisterRequest { Pseudo = "user2", Email = "user2@test.com" };
-
-            // Act
-            var reg1 = await ctrl.Register(register1, CancellationToken.None);
-            var reg2 = await ctrl.Register(register2, CancellationToken.None);
-
-            // Assert
-            var joueur1 = Assert.IsType<Joueur>(((OkObjectResult)reg1.Result!).Value);
-            var joueur2 = Assert.IsType<Joueur>(((OkObjectResult)reg2.Result!).Value);
-            Assert.NotEqual(joueur1.Id, joueur2.Id);
+            var repo = new Mock<IRepository<Joueur>>();
+            repo.Setup(r => r.ListAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Joueur> { new Joueur { Pseudo = "active", Actif = true, Id = Guid.NewGuid() } });
+                var ctrl = new JoueursController(repo.Object);
+            var req = new LoginRequest { Pseudo = "active" };
+            var result = await ctrl.Login(req, CancellationToken.None);
+            var ok = Assert.IsType<OkObjectResult>(result.Result);
+            var joueur = Assert.IsType<Joueur>(ok.Value);
+            Assert.Equal("active", joueur.Pseudo);
         }
 
         [Fact]
-        public async Task Login_ReturnsCorrectJoueur_WhenMultipleJoueursExist()
+        public async Task Login_ReturnsNotFoundIfInactive()
         {
-            // Summary: Vérifie que Login retourne le bon joueur quand plusieurs joueurs existent.
-
-            // Arrange
-            var opts = new DbContextOptionsBuilder<GameDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
-
-            await using var db = new GameDbContext(opts);
-            var repo = new Repository<Joueur>(db);
-            var ctrl = new JoueursController(repo);
-
-            var register1 = new RegisterRequest { Pseudo = "alice", Email = "alice@test.com" };
-            var register2 = new RegisterRequest { Pseudo = "bob", Email = "bob@test.com" };
-            await ctrl.Register(register1, CancellationToken.None);
-            await ctrl.Register(register2, CancellationToken.None);
-
-            // Act
-            var login = new LoginRequest { Pseudo = "alice" };
-            var log = await ctrl.Login(login, CancellationToken.None);
-
-            // Assert
-            var logOk = Assert.IsType<OkObjectResult>(log.Result);
-            var joueur = Assert.IsType<Joueur>(logOk.Value);
-            Assert.Equal("alice", joueur.Pseudo);
+            var repo = new Mock<IRepository<Joueur>>();
+            repo.Setup(r => r.ListAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Joueur> { new Joueur { Pseudo = "inactive", Actif = false } });
+                var ctrl = new JoueursController(repo.Object);
+            var req = new LoginRequest { Pseudo = "inactive" };
+            var result = await ctrl.Login(req, CancellationToken.None);
+            var notFound = Assert.IsType<NotFoundObjectResult>(result.Result);
+            Assert.Contains("désactivé", notFound.Value.ToString());
         }
 
         [Fact]
-        public async Task GetById_ReturnsCorrectJoueur()
+        public void Logout_DeletesCookiesAndReturnsNoContent()
         {
-            // Summary: Vérifie que GetById retourne le bon joueur.
+            var repo = new Mock<IRepository<Joueur>>();
+                var ctrl = new JoueursController(repo.Object);
+            var result = ctrl.Logout();
+            Assert.IsType<NoContentResult>(result);
+        }
 
-            // Arrange
-            var opts = new DbContextOptionsBuilder<GameDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
+        [Fact]
+        public async Task GetById_ReturnsNotFoundIfMissing()
+        {
+            var repo = new Mock<IRepository<Joueur>>();
+            repo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((Joueur)null);
+                var ctrl = new JoueursController(repo.Object);
+            var result = await ctrl.GetById(Guid.NewGuid(), CancellationToken.None);
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
 
-            await using var db = new GameDbContext(opts);
-            var repo = new Repository<Joueur>(db);
-            var ctrl = new JoueursController(repo);
+        [Fact]
+        public async Task GetById_ReturnsOkIfActive()
+        {
+            var repo = new Mock<IRepository<Joueur>>();
+            var joueur = new Joueur { Id = Guid.NewGuid(), Pseudo = "ok", Actif = true };
+            repo.Setup(r => r.GetByIdAsync(joueur.Id, It.IsAny<CancellationToken>())).ReturnsAsync(joueur);
+                var ctrl = new JoueursController(repo.Object);
+            var result = await ctrl.GetById(joueur.Id, CancellationToken.None);
+            var ok = Assert.IsType<OkObjectResult>(result.Result);
+            var j = Assert.IsType<Joueur>(ok.Value);
+            Assert.Equal("ok", j.Pseudo);
+        }
 
-            var register = new RegisterRequest { Pseudo = "test", Email = "test@test.com" };
-            var reg = await ctrl.Register(register, CancellationToken.None);
-            var joueur = Assert.IsType<Joueur>(((OkObjectResult)reg.Result!).Value);
+        [Fact]
+        public async Task GetById_ReturnsNotFoundIfInactive()
+        {
+            var repo = new Mock<IRepository<Joueur>>();
+            var joueur = new Joueur { Id = Guid.NewGuid(), Pseudo = "no", Actif = false };
+            repo.Setup(r => r.GetByIdAsync(joueur.Id, It.IsAny<CancellationToken>())).ReturnsAsync(joueur);
+                var ctrl = new JoueursController(repo.Object);
+            var result = await ctrl.GetById(joueur.Id, CancellationToken.None);
+            var notFound = Assert.IsType<NotFoundObjectResult>(result.Result);
+            Assert.Contains("admin", notFound.Value.ToString());
+        }
 
-            // Act
-            var get = await ctrl.GetById(joueur.Id, CancellationToken.None);
+        [Fact]
+        public async Task UpdateActif_UpdatesStatus()
+        {
+            var repo = new Mock<IRepository<Joueur>>();
+            var joueur = new Joueur { Id = Guid.NewGuid(), Pseudo = "update", Actif = false };
+            repo.Setup(r => r.GetByIdAsync(joueur.Id, It.IsAny<CancellationToken>())).ReturnsAsync(joueur);
+            repo.Setup(r => r.UpdateAsync(joueur, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+                var ctrl = new JoueursController(repo.Object);
+            var result = await ctrl.UpdateActif(joueur.Id, true, CancellationToken.None);
+            var ok = Assert.IsType<OkObjectResult>(result.Result);
+            var j = Assert.IsType<Joueur>(ok.Value);
+            Assert.True(j.Actif);
+        }
 
-            // Assert
-            var getOk = Assert.IsType<OkObjectResult>(get.Result);
-            var retrieved = Assert.IsType<Joueur>(getOk.Value);
-            Assert.Equal(joueur.Id, retrieved.Id);
-            Assert.Equal("test", retrieved.Pseudo);
+        [Fact]
+        public async Task ListAsync_ReturnsAllJoueurs()
+        {
+            var repo = new Mock<IRepository<Joueur>>();
+            var joueurs = new List<Joueur> { new Joueur { Pseudo = "a" }, new Joueur { Pseudo = "b" } };
+            repo.Setup(r => r.ListAsync(It.IsAny<CancellationToken>())).ReturnsAsync(joueurs);
+                var ctrl = new JoueursController(repo.Object);
+            var result = await ctrl.ListAsync(CancellationToken.None);
+            var ok = Assert.IsType<OkObjectResult>(result.Result);
+            var list = Assert.IsAssignableFrom<IEnumerable<Joueur>>(ok.Value);
+            Assert.Contains(list, j => j.Pseudo == "a");
+            Assert.Contains(list, j => j.Pseudo == "b");
         }
     }
 }

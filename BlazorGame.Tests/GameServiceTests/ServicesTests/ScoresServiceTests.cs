@@ -28,6 +28,8 @@ namespace BlazorGame.Tests.ServicesTests
 
             var joueurId = Guid.NewGuid();
             var partieId = Guid.NewGuid();
+            db.Joueurs.Add(new SharedModels.Domain.Users.Joueur { Id = joueurId, Pseudo = "TestUser" });
+            await db.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             // Act
             var created = await svc.CreateAsync(joueurId, partieId, 42, CancellationToken.None);
@@ -109,10 +111,14 @@ namespace BlazorGame.Tests.ServicesTests
             var svc = new ScoresService(db);
 
             var j1 = Guid.NewGuid();
+            var j2 = Guid.NewGuid();
             var p1 = Guid.NewGuid();
+            var p2 = Guid.NewGuid();
+            db.Joueurs.Add(new SharedModels.Domain.Users.Joueur { Id = j1, Pseudo = "User1" });
+            db.Joueurs.Add(new SharedModels.Domain.Users.Joueur { Id = j2, Pseudo = "User2" });
             await db.Scores.AddAsync(new Score { Id = Guid.NewGuid(), JoueurId = j1, PartieId = p1, Valeur = 100, EnregistreLe = DateTime.UtcNow }, CancellationToken.None);
-            await db.Scores.AddAsync(new Score { Id = Guid.NewGuid(), JoueurId = Guid.NewGuid(), PartieId = Guid.NewGuid(), Valeur = 50, EnregistreLe = DateTime.UtcNow }, CancellationToken.None);
-            await db.SaveChangesAsync(CancellationToken.None);
+            await db.Scores.AddAsync(new Score { Id = Guid.NewGuid(), JoueurId = j2, PartieId = p2, Valeur = 50, EnregistreLe = DateTime.UtcNow }, CancellationToken.None);
+            await db.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             // Act
             var board = await svc.GetLeaderboardAsync(CancellationToken.None);

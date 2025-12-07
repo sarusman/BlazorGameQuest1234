@@ -36,15 +36,18 @@ namespace BlazorGame.GameService.Services
               .OrderByDescending(x => x.EnregistreLe)
               .ToListAsync(ct);
 
-        /// <summary>Retourne le top 10 global des scores.</summary>
+        /// <summary>Retourne le top 10 global des scores avec pseudo.</summary>
         public Task<List<object>> GetLeaderboardAsync(CancellationToken ct) =>
             _db.Scores.AsNoTracking()
-              .OrderByDescending(s => s.Valeur)
-              .ThenBy(s => s.EnregistreLe)
-              .Take(10)
-              .Select(s => new { s.JoueurId, s.PartieId, s.Valeur, s.EnregistreLe })
-              .Cast<object>()
-              .ToListAsync(ct);
+                .OrderByDescending(s => s.Valeur)
+                .ThenBy(s => s.EnregistreLe)
+                .Take(10)
+                .Join(_db.Joueurs.AsNoTracking(),
+                      s => s.JoueurId,
+                      j => j.Id,
+                      (s, j) => new { Pseudo = j.Pseudo, Score = s.Valeur })
+                .Cast<object>()
+                .ToListAsync(ct);
 
         /// <summary>
         /// Retourne l’unique score final associé à un donjon.

@@ -7,11 +7,24 @@ Juphil Godwin KANLINSOU
 
 Sarusman SATKUNARAJAH
 
-# Version 3 - Cahier des charges
+# Version 4 - Cahier des charges
 
-## Démarrage VERSION 3
+## Points clés version 4
 
-`docker compose up --build` <br>
+- **Admin par défaut** : `admin1234`
+- Un joueur ne voit pas le pseudo des autres joueurs.
+- Un admin voit le classement général (pseudo, inventaire, détails de tous).
+- La liste des salles est incluse dans le donjon (GET donjon → salles).
+- Impossible de créer un joueur si le pseudo existe déjà.
+- Version préliminaire : Keycloak va remplacer la gestion des rôles.
+- Les tests négatifs ne tiennent plus compte du client ni des SharedModels (comme vu en classe).
+- Exécution des tests :
+  ```sh
+  dotnet test --settings BlazorGame.Tests/coverlet.runsettings
+  ```
+
+## Démarrage
+`docker compose up --build`
 
 ## URLS : 
 
@@ -26,9 +39,22 @@ Sarusman SATKUNARAJAH
 (Même IHM)
 <img width="1600" height="1243" alt="hLZDRjj64BxhAHRA8R9XMxOJfqxX6gKeob6YlufoWYBEOIMkPJhKhhfSsb427me41GeKRT6aADgBUsgYOs_jfHUzILwWVeJExbBIIgJi01LjsDHmvfl_cQK-3mNc8ke56U6BWA2hov___lUl7z3gQY70Bna_m3s2rb4fY5uWxpRkzqc0SXNI4H4dA8z6ttQuB-zNLbSpcV2vJ_kOunvguyxpBcSHzM" src="https://github.com/user-attachments/assets/cc60276c-d95c-4d55-8752-a0af412e07d8" />
 
-## Fonctionnement de la version 3 : 
+## Fonctionnement de la version 4 :
 
-## Flux de Jeu
+### Rôles et permissions
+
+#### Branche Admin
+- Voir le classement général (pseudo, inventaire, détails de tous les joueurs)
+- Gérer les joueurs (activation, export, etc.)
+- Accéder à tous les endpoints d’administration
+
+#### Branche Utilisateur
+- Jouer et créer une partie
+- Voir uniquement ses propres informations
+- Ne pas voir les pseudos des autres joueurs
+- Impossible de créer un pseudo déjà existant
+
+> Un utilisateur doit être connecté pour jouer.
 
 ### Démarrage
 - **Page d'accueil** → Nouvelle aventure → Génération d'un donjon selon la difficulté
@@ -116,15 +142,14 @@ Sarusman SATKUNARAJAH
 **Serveur : front servi par Nginx (SPA fallback activé).**
 
 
-## Test VERSION 3
 
-(Automatiquement éxécuté dans le CI : https://github.com/sarusman/BlazorGameQuest1234/actions).
-Vous pouvez aussi lancer : <br>
-`dotnet test`
+## Tests
 
-### Résultats des tests :
-<img width="1321" height="687" alt="Capture d’écran 2025-11-23 à 15 10 17" src="https://github.com/user-attachments/assets/9dd2ddb6-af10-44a9-8099-0ef9b70029e2" />
-**Coverage : 82%**
+Automatiquement exécuté dans le CI : https://github.com/sarusman/BlazorGameQuest1234/actions
+Lancer manuellement :
+```sh
+dotnet test --settings BlazorGame.Tests/coverlet.runsettings
+```
 
 
 # Version 3 - Cahier des charges

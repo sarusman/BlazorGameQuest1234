@@ -12,6 +12,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 builder.Services.AddDbContext<GameDbContext>(options =>
     options.UseInMemoryDatabase("GameDb")
 );
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 builder.Services.AddScoped(typeof(Repository<>));
 builder.Services.AddScoped<GameplayService>();
@@ -22,9 +23,10 @@ builder.Services.AddScoped<PartieService>();
 
 builder.Services.AddCors(o =>
     o.AddPolicy("AllowBlazorClient", p =>
-        p.WithOrigins("http://localhost:5000")
-        .AllowAnyHeader()
-        .AllowAnyMethod()
+        p.WithOrigins("https://localhost:5000", "http://localhost:5000")
+         .AllowAnyHeader()
+         .AllowAnyMethod()
+         .AllowCredentials()
     )
 );
 
@@ -43,10 +45,10 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<BlazorGame.GameService.Persistence.GameDbContext>();
+    var db = scope.ServiceProvider.GetRequiredService<GameDbContext>();
     db.Database.EnsureCreated();
 
-    var guestId = Guid.Parse("00000000-0000-0000-0000-000000000001"); // pour tester
+    var guestId = Guid.Parse("00000000-0000-0000-0000-000000000001");
     if (!db.Joueurs.Any(j => j.Id == guestId))
     {
         db.Joueurs.Add(new SharedModels.Domain.Users.Joueur
@@ -56,11 +58,30 @@ using (var scope = app.Services.CreateScope())
             KeycloakUserName = "guest",
             Actif = true
         });
+        db.Joueurs.Add(new SharedModels.Domain.Users.Joueur
+        {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000002"),
+            Pseudo = "Admin",
+            KeycloakUserName = "admin",
+            Actif = true,
+            Admin = true
+        });
+        db.SaveChanges();
+    }
+    // creation d'un admin par défaut
+    if (!db.Joueurs.Any(j => j.Pseudo == "admin1234" && j.Admin))
+    {
+        db.Joueurs.Add(new SharedModels.Domain.Users.Joueur
+        {
+            Id = Guid.NewGuid(),
+            Pseudo = "admin1234",
+            KeycloakUserName = "admin1234",
+            Actif = true,
+            Admin = true
+        });
         db.SaveChanges();
     }
 }
-
-
 app.UseStaticFiles();
 app.UseCors("AllowBlazorClient");
 

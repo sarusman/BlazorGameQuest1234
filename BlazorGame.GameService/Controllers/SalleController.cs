@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using BlazorGame.GameService.Services;
 using SharedModels.Domain.Gameplay;
 using SharedModels.Domain.Common.Enums;
+using BlazorGame.GameService.Filters;
 
 namespace BlazorGame.GameService.Controllers
 {
@@ -9,6 +10,7 @@ namespace BlazorGame.GameService.Controllers
     /// Endpoints de génération de salle (aléatoire).
     /// </summary>
     [ApiController]
+    [RequireLogin]
     [Route("api/[controller]")]
     public class SalleController : ControllerBase
     {

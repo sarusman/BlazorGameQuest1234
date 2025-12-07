@@ -48,5 +48,32 @@ namespace BlazorGame.GameService.Controllers
             var score = await _service.GetByDonjonAsync(donjonId, ct);
             return score is null ? NotFound() : Ok(score);
         }
+
+        /// <summary>Historique détaillé : scores, pseudo, inventaire final.</summary>
+        [HttpGet("history-full")]
+        public async Task<ActionResult<List<object>>> GetHistoryFull(CancellationToken ct)
+        {
+            var scores = await _service.GetAllAsync(ct);
+            
+            var joueurs = scores.Select(s => s.JoueurId).Distinct().ToList();
+            var db = HttpContext.RequestServices.GetService(typeof(BlazorGame.GameService.Persistence.GameDbContext)) as BlazorGame.GameService.Persistence.GameDbContext;
+            var joueursDict = db!.Joueurs.ToDictionary(j => j.Id, j => j);
+
+            var inventaires = db!.Set<SharedModels.Domain.Items.InventaireItem>().ToList();
+            var objets = db!.Set<SharedModels.Domain.Items.Objet>().ToList();
+
+
+            var result = scores.Select(s => new {
+                Joueur = joueursDict.TryGetValue(s.JoueurId, out var j) ? j.Pseudo : (j?.Pseudo ?? "?"),
+                Score = s.Valeur,
+                Date = s.EnregistreLe,
+                Inventaire = inventaires.Where(ii => ii.JoueurId == s.JoueurId)
+                    .Select(ii => new {
+                        Objet = objets.FirstOrDefault(o => o.Id == ii.ObjetId)?.Nom ?? "?",
+                        ii.Quantite
+                    }).ToList()
+            }).ToList();
+            return Ok(result);
+        }
     }
 }

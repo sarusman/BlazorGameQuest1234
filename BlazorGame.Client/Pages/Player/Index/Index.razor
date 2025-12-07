@@ -1,28 +1,56 @@
 @page "/"
 
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <div class="home-container">
     <video autoplay muted loop>
         <source src="videos/background.mp4" type="video/mp4">
     </video>
+
     <div class="credits">
         <span>Les videos viennent de Google Veo 3 | Une partie du design (css) de Claude AI</span>
     </div>
+
     <div class="hero-section">
+        @if (!string.IsNullOrWhiteSpace(pseudo))
+        {
+            <div class="welcome">Bienvenue, <strong>@pseudo</strong></div>
+        }
         <button class="btn-play" @onclick="StartAdventure">Nouvelle aventure</button>
     </div>
 
     <nav class="bottom-nav">
         <a href="/inscription" class="nav-link">Créer un utilisateur</a>
         <a href="/connexion" class="nav-link">Se connecter</a>
+        <a href="/admin-connexion" class="nav-link">Se connecter Admin</a>
         <a href="/history" class="nav-link">Classement</a>
+    <a href="/my-histo" class="nav-link" @(string.IsNullOrWhiteSpace(pseudo) ? "style='pointer-events:none;opacity:0.5'" : "")>Mon historique</a>
     </nav>
-
 </div>
 
-@inject NavigationManager Navigation
+<script>
+  window.__getCookie = function (name) {
+    const m = document.cookie.match('(?:^|; )' + name + '=([^;]*)');
+    return m ? decodeURIComponent(m[1]) : '';
+  };
+</script>
 
 @code {
+    private string? pseudo;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        try
+        {
+            pseudo = await JS.InvokeAsync<string>("__getCookie", "pseudo");
+            StateHasChanged();
+        }
+        catch
+        {
+        }
+    }
     private void StartAdventure()
     {
         Navigation.NavigateTo("/new-adventure");

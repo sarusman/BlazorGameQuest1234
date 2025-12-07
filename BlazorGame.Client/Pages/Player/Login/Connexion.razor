@@ -1,5 +1,81 @@
 @page "/connexion"
-
 @inject HttpClient Http
+@inject NavigationManager Nav
+@inject IJSRuntime JS
 
-<h2>Se connecter</h2>
+<div class="connexion-container">
+    <div class="connexion-card">
+        <h1>Se connecter</h1>
+
+        @if (!string.IsNullOrWhiteSpace(error))
+        {
+            <div class="error-message">@error</div>
+        }
+
+        <div class="form-group">
+            <input class="input-field"
+                   placeholder="Pseudo"
+                   @bind="pseudo" />
+        </div>
+
+        <button class="btn-connect"
+                @onclick="Connecter"
+                disabled="@loading">
+            @(loading ? "Connexion..." : "Se connecter")
+        </button>
+
+        <p class="footer-text">
+            Pas de compte ?
+            <a href="/inscription">S'inscrire</a>
+        </p>
+    </div>
+</div>
+
+<script>
+  window.setCookie = function (name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days*24*60*60*1000));
+    document.cookie = name + "=" + encodeURIComponent(value) + "; expires=" + d.toUTCString() + "; path=/";
+  };
+</script>
+
+@code {
+    private string pseudo = "";
+    private string error = "";
+    private bool loading = false;
+
+    private async Task Connecter()
+    {
+        error = "";
+        if (string.IsNullOrWhiteSpace(pseudo)) { error = "Entrez un pseudo."; return; }
+        loading = true;
+
+        try
+        {
+            var res = await Http.PostAsJsonAsync("/api/joueurs/login", new { Pseudo = pseudo });
+            if (!res.IsSuccessStatusCode) { error = "Pseudo introuvable."; return; }
+
+            var j = await res.Content.ReadFromJsonAsync<JoueurDto>();
+            if (j is null) { error = "Réponse invalide."; return; }
+
+            await JS.InvokeVoidAsync("setCookie", "pseudo", j.Pseudo, 30);
+            await JS.InvokeVoidAsync("setCookie", "joueurId", j.Id.ToString(), 30);
+
+            Nav.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            error = $"Erreur: {ex.Message}";
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private class JoueurDto
+    {
+        public Guid Id { get; set; }
+        public string Pseudo { get; set; } = "";
+    }
+}

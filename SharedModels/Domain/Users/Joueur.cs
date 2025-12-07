@@ -12,6 +12,7 @@ namespace SharedModels.Domain.Users
         public string Pseudo { get; set; } = string.Empty;
         public string KeycloakUserName { get; set; } = string.Empty;
         public bool Actif { get; set; } = true;
+        public bool Admin { get; set; } = false;
         public ICollection<InventaireItem> Inventaire { get; set; } = new List<InventaireItem>();
         public ICollection<Score> Scores { get; set; } = new List<Score>();
         public ICollection<Sauvegarde> Sauvegardes { get; set; } = new List<Sauvegarde>();
