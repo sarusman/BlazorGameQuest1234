@@ -37,7 +37,7 @@
     private string? errorMessage;
     private async Task HandleLogin()
     {
-        var response = await Http.PostAsJsonAsync("http://localhost:5051/api/auth/login", credentials);
+        var response = await Http.PostAsJsonAsync("/api/auth/login", credentials);
         
         if (response.IsSuccessStatusCode)
         {

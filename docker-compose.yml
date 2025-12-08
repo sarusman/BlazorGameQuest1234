@@ -12,6 +12,24 @@ services:
     networks:
       - appnet
 
+  # auth service
+  authservice:
+    build:
+      context: .
+      dockerfile: AuthenticationServices/Dockerfile
+    ports:
+      - "5052:5052"
+    environment:
+      - ASPNETCORE_URLS=http://+:5052
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Keycloak__TokenUrl=http://keycloak:8080/realms/blazorgame/protocol/openid-connect/token
+      - Keycloak__ClientId=blazorgame-client
+      - Keycloak__ClientSecret=
+    depends_on:
+      - keycloak
+    networks:
+      - appnet
+
   #frontend
   client:
     build:
@@ -63,7 +81,7 @@ services:
       dockerfile: KeycloakAuthService/Dockerfile
     container_name: keycloak_auth_service_blazor
     ports:
-      - "5051:5051" #port d'écoute l'hote et port du conteneur
+      - "5007:5007" #port d'écoute l'hote et port du conteneur
     networks:
       - appnet
   

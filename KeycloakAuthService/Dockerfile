@@ -22,8 +22,8 @@ COPY --from=build /app/out ./
 # Set environment variables if needed (e.g., ASPNETCORE_ENVIRONMENT)
 # ENV ASPNETCORE_ENVIRONMENT=Production
 
-# Expose port 5051
-EXPOSE 5051
+# Expose port 5007
+EXPOSE 5007
 
 # Define the entry point
 ENTRYPOINT ["dotnet", "KeycloakAuthService.dll"]

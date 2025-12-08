@@ -20,6 +20,6 @@ builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>
 builder.Services.AddScoped(sp =>
     new HttpClient
     {
-        BaseAddress = new Uri("http://localhost:8080")
+        BaseAddress = new Uri("http://localhost:5001")
     });
 await builder.Build().RunAsync();
