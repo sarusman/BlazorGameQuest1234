@@ -9,6 +9,8 @@ services:
     environment:
       - ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - appnet
 
   #frontend
   client:
@@ -19,6 +21,8 @@ services:
       - "5003:80"
     depends_on:
       - gameservice
+    networks:
+      - appnet
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.1.0
@@ -38,6 +42,25 @@ services:
     volumes:
       - keycloak-data:/opt/keycloak/data
     command: ["start-dev"]
+    networks:
+      - appnet
+
+  api-gateway:
+    build: 
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    container_name: api_gateway_gamequest
+    ports:
+      - "5001:5001" #port d'écoute l'hote et port du conteneur
+    depends_on:
+      - gameservice
+    networks:
+      - appnet
+  
 
 volumes:
   keycloak-data:
+
+networks:
+  appnet:
+    driver: bridge

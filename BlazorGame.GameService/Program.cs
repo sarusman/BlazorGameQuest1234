@@ -41,15 +41,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddAuthentication.AddJwtBearer(options =>
-{
-    options.Authority = "http://localhost:8180/realms/gamequest";
-    options.Audience = "gamequest-backend";
-    options.RequireHttpsMetadata = false;
-});
-
-builder.Services.AddAuthorizationBuilder();
-
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
