@@ -56,6 +56,16 @@ services:
       - gameservice
     networks:
       - appnet
+
+  keycloak-auth-service:
+    build:
+      context: .
+      dockerfile: KeycloakAuthService/Dockerfile
+    container_name: keycloak_auth_service_blazor
+    ports:
+      - "5051:5051" #port d'écoute l'hote et port du conteneur
+    networks:
+      - appnet
   
 
 volumes:
