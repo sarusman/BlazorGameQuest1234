@@ -7,16 +7,25 @@ Juphil Godwin KANLINSOU
 
 Sarusman SATKUNARAJAH
 
-# Version 4 - Cahier des charges
 
-## Points clés version 4
+# Version 5 - Cahier des charges
 
+## Points clés version 5
+
+- **Intégration de Keycloak** :
+  - Authentification OpenID Connect
+  - Attribution des rôles joueur et admin
+  - Sécurisation des API
+  - Création d'une page de connexion dans le projet Blazor (seuls les utilisateurs Keycloak peuvent se connecter)
+  - Toutes les pages du projet web sont accessibles uniquement à un utilisateur authentifié
+- **Enrichissement de la documentation Swagger** : descriptions claires pour chaque endpoint
+- **Déploiement sous Docker** : tous les services sont dockerisés
+- **Gateway comme point d’entrée unique** : toutes les requêtes API passent par la Gateway
 - **Admin par défaut** : `admin1234`
 - Un joueur ne voit pas le pseudo des autres joueurs.
 - Un admin voit le classement général (pseudo, inventaire, détails de tous).
 - La liste des salles est incluse dans le donjon (GET donjon → salles).
 - Impossible de créer un joueur si le pseudo existe déjà.
-- Version préliminaire : Keycloak va remplacer la gestion des rôles.
 - Les tests négatifs ne tiennent plus compte du client ni des SharedModels (comme vu en classe).
 - Exécution des tests :
   ```sh
