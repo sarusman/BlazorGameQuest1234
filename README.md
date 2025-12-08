@@ -161,10 +161,6 @@ dotnet test --settings BlazorGame.Tests/coverlet.runsettings
 ```
 
 
-# Version 3 - Cahier des charges
-<img width="705" height="418" alt="Capture d’écran 2025-11-09 à 14 05 38" src="https://github.com/user-attachments/assets/a99d07b3-d7a1-46d8-baf0-44f4312b78db" />
-
-
 ## Mise en place d’une Intégration Continue (CI)
 
 À chaque push, le pipeline exécute automatiquement :
