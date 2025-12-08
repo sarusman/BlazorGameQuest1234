@@ -39,6 +39,13 @@ builder.Services.AddSwaggerGen(options =>
         Title = "BlazorGame.GameService API",
         Version = "v1"
     });
+
+    var xmlFile = $"BlazorGame.GameService.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
 });
 
 var app = builder.Build();

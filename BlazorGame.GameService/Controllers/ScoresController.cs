@@ -17,6 +17,9 @@ namespace BlazorGame.GameService.Controllers
         public ScoresController(ScoresService service) => _service = service;
 
         /// <summary>Crée un score manuel.</summary>
+        /// <summary>
+        /// Crée un score manuel.
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<Score>> Post([FromBody] ScoreRequest request, CancellationToken ct)
         {
@@ -25,6 +28,9 @@ namespace BlazorGame.GameService.Controllers
         }
 
         /// <summary>Retourne tous les scores.</summary>
+        /// <summary>
+        /// Retourne tous les scores.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<List<Score>>> GetAll(CancellationToken ct)
         {
@@ -33,6 +39,9 @@ namespace BlazorGame.GameService.Controllers
         }
 
         /// <summary>Top 10 global.</summary>
+        /// <summary>
+        /// Top 10 global (leaderboard).
+        /// </summary>
         [HttpGet("leaderboard")]
         public async Task<ActionResult<List<object>>> Leaderboard(CancellationToken ct)
         {
@@ -42,6 +51,9 @@ namespace BlazorGame.GameService.Controllers
 
         /// <summary>Score final d’un donjon.</summary>
         /// <param name="donjonId">Id du donjon.</param>
+        /// <summary>
+        /// Score final d’un donjon.
+        /// </summary>
         [HttpGet("score/{donjonId:guid}")]
         public async Task<ActionResult<Score?>> ByDonjon(Guid donjonId, CancellationToken ct)
         {
@@ -50,6 +62,9 @@ namespace BlazorGame.GameService.Controllers
         }
 
         /// <summary>Historique détaillé : scores, pseudo, inventaire final.</summary>
+        /// <summary>
+        /// Historique détaillé : scores, pseudo, inventaire final.
+        /// </summary>
         [HttpGet("history-full")]
         public async Task<ActionResult<List<object>>> GetHistoryFull(CancellationToken ct)
         {

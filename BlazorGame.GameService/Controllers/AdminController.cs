@@ -21,12 +21,18 @@ namespace BlazorGame.GameService.Controllers
             _scoresService = scoresService;
         }
 
+        /// <summary>
+        /// Récupère la liste des joueurs.
+        /// </summary>
         [HttpGet("joueurs")]
         public async Task<ActionResult<IEnumerable<Joueur>>> GetJoueurs(CancellationToken ct)
         {
             return Ok(await _joueurRepo.ListAsync(ct));
         }
 
+        /// <summary>
+        /// Définit l'état actif d'un joueur.
+        /// </summary>
         [HttpPut("joueurs/{id:guid}/actif")]
         public async Task<ActionResult<Joueur>> SetJoueurActif(Guid id, [FromBody] bool actif, CancellationToken ct)
         {
@@ -37,6 +43,9 @@ namespace BlazorGame.GameService.Controllers
             return Ok(joueur);
         }
 
+        /// <summary>
+        /// Récupère la liste des scores.
+        /// </summary>
         [HttpGet("scores")]
         public async Task<ActionResult<IEnumerable<object>>> GetScores(CancellationToken ct)
         {
@@ -44,6 +53,9 @@ namespace BlazorGame.GameService.Controllers
             return Ok(scores);
         }
 
+        /// <summary>
+        /// Récupère le classement général (leaderboard).
+        /// </summary>
         [HttpGet("leaderboard")]
         public async Task<ActionResult<IEnumerable<object>>> GetLeaderboard(CancellationToken ct)
         {
@@ -51,12 +63,18 @@ namespace BlazorGame.GameService.Controllers
             return Ok(leaderboard);
         }
 
+        /// <summary>
+        /// Récupère la liste des parties.
+        /// </summary>
         [HttpGet("parties")]
         public async Task<ActionResult<IEnumerable<Partie>>> GetParties(CancellationToken ct)
         {
             return Ok(await _partieRepo.ListAsync(ct));
         }
 
+        /// <summary>
+        /// Exporte la liste des joueurs au format CSV.
+        /// </summary>
         [HttpGet("export-joueurs")]
         public async Task<IActionResult> ExportJoueurs(CancellationToken ct)
         {
@@ -65,6 +83,9 @@ namespace BlazorGame.GameService.Controllers
             return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", "joueurs.csv");
         }
 
+        /// <summary>
+        /// Authentifie un administrateur.
+        /// </summary>
         [HttpPost("login")]
         
         public async Task<ActionResult<Joueur>> Login([FromBody] SharedModels.Domain.Users.LoginRequest request, CancellationToken ct)

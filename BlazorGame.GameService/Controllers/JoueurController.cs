@@ -16,6 +16,9 @@ namespace BlazorGame.GameService.Controllers
             _joueurRepo = joueurRepo;
         }
 
+        /// <summary>
+        /// Inscrit un nouveau joueur.
+        /// </summary>
         [HttpPost("register")]
         public async Task<ActionResult<Joueur>> Register([FromBody] RegisterRequest request, CancellationToken ct)
         {
@@ -61,6 +64,9 @@ namespace BlazorGame.GameService.Controllers
             return Ok(joueur);
         }
 
+        /// <summary>
+        /// Connecte un joueur existant.
+        /// </summary>
         [HttpPost("login")]
         public async Task<ActionResult<Joueur>> Login([FromBody] LoginRequest request, CancellationToken ct)
         {
@@ -93,6 +99,9 @@ namespace BlazorGame.GameService.Controllers
             return Ok(joueur);
         }
 
+        /// <summary>
+        /// Déconnecte le joueur (supprime les cookies).
+        /// </summary>
         [HttpPost("logout")]
         public IActionResult Logout()
         {
@@ -104,6 +113,9 @@ namespace BlazorGame.GameService.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Récupère un joueur par son Id.
+        /// </summary>
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<Joueur>> GetById(Guid id, CancellationToken ct)
         {
@@ -113,6 +125,9 @@ namespace BlazorGame.GameService.Controllers
             return Ok(joueur);
         }
 
+        /// <summary>
+        /// Modifie l’état actif d’un joueur.
+        /// </summary>
         [HttpPut("{id:guid}/actif")]
         public async Task<ActionResult<Joueur>> UpdateActif(Guid id, [FromBody] bool actif, CancellationToken ct)
         {
@@ -124,6 +139,9 @@ namespace BlazorGame.GameService.Controllers
             return Ok(joueur);
         }
 
+        /// <summary>
+        /// Liste tous les joueurs.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Joueur>>> ListAsync(CancellationToken ct)
         {

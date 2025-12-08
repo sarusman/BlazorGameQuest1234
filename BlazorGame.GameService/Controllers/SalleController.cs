@@ -32,6 +32,9 @@ namespace BlazorGame.GameService.Controllers
         /// <param name="type">Type de salle (Combat, Coffre, ...). Laisse null pour aléatoire.</param>
         /// <param name="seed">Graine RNG optionnelle (pour résultat reproductible).</param>
         /// <returns>La salle générée.</returns>
+        /// <summary>
+        /// Génère une salle aléatoire.
+        /// </summary>
         [HttpGet("random")]
         public ActionResult<Salle> Random(
             [FromQuery] Difficulte difficulte = Difficulte.Normal,

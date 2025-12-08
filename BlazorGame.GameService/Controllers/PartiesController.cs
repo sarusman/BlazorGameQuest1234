@@ -12,6 +12,9 @@ namespace BlazorGame.GameService.Controllers
 
         public PartiesController(PartieService service) { _service = service; }
 
+        /// <summary>
+        /// Démarre une nouvelle partie.
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<Partie>> Demarrer([FromBody] StartPartieRequest request, CancellationToken ct)
         {
@@ -19,6 +22,9 @@ namespace BlazorGame.GameService.Controllers
             return p is null ? Conflict("Partie déjà existante pour ce donjon.") : Ok(p);
         }
 
+        /// <summary>
+        /// Applique un choix dans une salle pour une partie donnée.
+        /// </summary>
         [HttpPost("{id:guid}/choisir")]
         public async Task<ActionResult<ChoisirResponse>> Choisir(Guid id, [FromBody] ChoisirRequest request, CancellationToken ct)
         {
