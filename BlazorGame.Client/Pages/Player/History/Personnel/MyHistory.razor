@@ -3,6 +3,7 @@
 @inject HttpClient Http
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthProvider
 
 <link rel="stylesheet" href="css/history.css">
 
@@ -69,10 +70,21 @@
         loading = true;
         try
         {
-            pseudo = await JS.InvokeAsync<string>("eval", "document.cookie.split('; ').find(row => row.startsWith('pseudo='))?.split('=')[1] || ''");
+            var authState = await AuthProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            pseudo = user?.Identity?.Name ?? user?.FindFirst("preferred_username")?.Value ?? "";
+            Console.WriteLine($"MyHistory: pseudo={pseudo}");
+            
             var pseudoNorm = (pseudo ?? "").Trim().ToLowerInvariant();
+            Console.WriteLine($"MyHistory: pseudoNorm={pseudoNorm}");
+            
             var history = await Http.GetFromJsonAsync<List<HistoryRow>>("/api/scores/history-full") ?? new();
+            Console.WriteLine($"MyHistory: received {history.Count} items");
+            
             allPseudos = history.Select(h => h.Joueur).Distinct().OrderBy(x => x).ToList();
+            Console.WriteLine($"MyHistory: allPseudos={string.Join(", ", allPseudos)}");
+            
+            // MyHistory: Filtrer uniquement les scores de l'utilisateur connecté
             items = history
                 .Where(s => (s.Joueur ?? "").Trim().ToLowerInvariant() == pseudoNorm)
                 .OrderByDescending(s => s.Date)
@@ -84,10 +96,12 @@
                     s.Inventaire
                 ))
                 .ToList();
+            Console.WriteLine($"MyHistory: filtered to {items.Count} items for user '{pseudo}'");
         }
         catch (Exception ex)
         {
             error = $"Erreur: {ex.Message}";
+            Console.WriteLine($"MyHistory ERROR: {ex}");
         }
         finally { loading = false; }
     }

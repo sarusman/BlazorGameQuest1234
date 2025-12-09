@@ -2,6 +2,7 @@
 
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
+@inject AuthenticationStateProvider AuthProvider
 
 <div class="home-container">
     <video autoplay muted loop>
@@ -13,42 +14,50 @@
     </div>
 
     <div class="hero-section">
-        @if (!string.IsNullOrWhiteSpace(pseudo))
+        @if (!string.IsNullOrWhiteSpace(username))
         {
-            <div class="welcome">Bienvenue, <strong>@pseudo</strong></div>
+            <div class="welcome">Bienvenue, <strong>@username</strong></div>
         }
         <button class="btn-play" @onclick="StartAdventure">Nouvelle aventure</button>
     </div>
 
     <nav class="bottom-nav">
-        <a href="/login" class="nav-link">Se connecter</a>
+        <AuthorizeView>
+            <Authorized>
+                <a href="/logout" class="nav-link">Se déconnecter</a>
+            </Authorized>
+            <NotAuthorized>
+                <a href="/login" class="nav-link">Se connecter</a>
+            </NotAuthorized>
+        </AuthorizeView>
         <a href="/history" class="nav-link">Classement</a>
-    <a href="/my-histo" class="nav-link" @(string.IsNullOrWhiteSpace(pseudo) ? "style='pointer-events:none;opacity:0.5'" : "")>Mon historique</a>
+        <AuthorizeView>
+            <Authorized>
+                <a href="/history" class="nav-link">Historique</a>
+                    <AuthorizeView Roles="admin">
+                            <Authorized Context="adminContext">
+                                <a href="/admin/dashboard" class="nav-link">Admin Dashboard</a>
+                            </Authorized>
+                    </AuthorizeView>
+            </Authorized>
+        </AuthorizeView>
     </nav>
 </div>
 
-<script>
-  window.__getCookie = function (name) {
-    const m = document.cookie.match('(?:^|; )' + name + '=([^;]*)');
-    return m ? decodeURIComponent(m[1]) : '';
-  };
-</script>
-
 @code {
-    private string? pseudo;
+    private string? username;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (!firstRender) return;
-        try
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        
+        if (user.Identity?.IsAuthenticated == true)
         {
-            pseudo = await JS.InvokeAsync<string>("__getCookie", "pseudo");
-            StateHasChanged();
-        }
-        catch
-        {
+            username = user.Identity.Name;
         }
     }
+
     private void StartAdventure()
     {
         Navigation.NavigateTo("/new-adventure");

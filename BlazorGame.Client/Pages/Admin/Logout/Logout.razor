@@ -1,0 +1,16 @@
+@page "/logout"
+@attribute [AllowAnonymous]
+
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager Navigation
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthProvider is CustomAuthStateProvider customProvider)
+        {
+            await customProvider.Logout();
+        }
+        Navigation.NavigateTo("/");
+    }
+}

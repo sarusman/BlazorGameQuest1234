@@ -6,21 +6,11 @@
 @inject NavigationManager Nav
 @using BlazorGame.Client.Pages.Admin.Models
 
-@if (!isAdmin)
-{
-    <div class="admin-container">
-        <h2>Accès refusé</h2>
-        <p>Vous devez être connecté en tant qu'administrateur pour accéder au dashboard.</p>
-        <button class="btn btn-primary" @onclick="GoToLogin">Se connecter admin</button>
-    </div>
-}
-else
-{
-    <div class="admin-container">
-        <img src="images/admin-bg.png" alt="Admin Background" class="background-image" />
-        
-        <div class="admin-content">
-            <h3>Tableau de bord Admin</h3>
+<div class="admin-container">
+    <img src="images/admin-bg.png" alt="Admin Background" class="background-image" />
+    
+    <div class="admin-content">
+        <h3>Tableau de bord Admin</h3>
 
             @if (joueurs == null)
             {
@@ -146,20 +136,19 @@ else
         </div>
     </div>
 
-    @if (showToast)
-    {
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header">
-                    <strong class="me-auto">Notification</strong>
-                    <button type="button" class="btn-close" @onclick="CloseToast"></button>
-                </div>
-                <div class="toast-body">
-                    @toastMessage
-                </div>
+@if (showToast)
+{
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Notification</strong>
+                <button type="button" class="btn-close" @onclick="CloseToast"></button>
+            </div>
+            <div class="toast-body">
+                @toastMessage
             </div>
         </div>
-    }
+    </div>
 }
 
 @code {
@@ -169,17 +158,9 @@ else
     private string toastMessage = string.Empty;
     private LeaderboardEntry[]? leaderboard;
     private PartieAdminView[]? parties;
-    private bool isAdmin = false;
 
     protected override async Task OnInitializedAsync()
     {
-        var pseudo = await JS.InvokeAsync<string>("eval", "document.cookie.split('; ').find(row => row.startsWith('pseudo='))?.split('=')[1] || ''");
-        isAdmin = pseudo == "admin1234";
-        if (!isAdmin)
-        {
-            Nav.NavigateTo("/admin-connexion", true);
-            return;
-        }
         await LoadData();
     }
 
@@ -233,10 +214,5 @@ else
     private void CloseToast()
     {
         showToast = false;
-    }
-
-    private void GoToLogin()
-    {
-        Nav.NavigateTo("/admin-connexion", true);
     }
 }

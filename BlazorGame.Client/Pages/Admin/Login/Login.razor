@@ -9,28 +9,37 @@
 @inject IJSRuntime JS;
 @inject ITokenService localStorage;
 
-<h3>Connexion</h3>
 
-<EditForm Model="@credentials" OnValidSubmit="@HandleLogin">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<div class="login-container">
+    <h3>Connexion</h3>
 
-    <div>
-        <label>Nom d'utilisateur:</label>
-        <InputText @bind-Value="credentials.Username" class="form-control" />
+    <EditForm Model="@credentials" OnValidSubmit="@HandleLogin">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label>Nom d'utilisateur:</label>
+            <InputText @bind-Value="credentials.Username" class="form-control" />
+        </div>
+        <div>
+            <label>Mot de passe:</label>
+            <InputText @bind-Value="credentials.Password" type="password" class="form-control" />
+        </div>
+        <button type="submit" class="btn">Se connecter</button>
+    </EditForm>
+
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+    <div class="login-infos">
+        <strong>Admin :</strong><br />
+        Identifiant : <span>admin1</span> &nbsp;|&nbsp; Password : <span>admin</span><br />
+        <strong>Player :</strong><br />
+        Identifiant : <span>player1</span> &nbsp;|&nbsp; Password : <span>player1</span>
     </div>
-    <div>
-        <label>Mot de passe:</label>
-        <InputText @bind-Value="credentials.Password" type="password" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Se connecter</button>
-</EditForm>
-
-
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <div class="alert alert-danger">@errorMessage</div>
-}
+</div>
 
 @code {
     private UserCredentials credentials = new();

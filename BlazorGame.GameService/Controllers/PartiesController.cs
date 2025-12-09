@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using BlazorGame.GameService.Services;
 using SharedModels.Domain.Gameplay;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorGame.GameService.Controllers
 {
@@ -9,8 +11,13 @@ namespace BlazorGame.GameService.Controllers
     public class PartiesController : ControllerBase
     {
         private readonly PartieService _service;
+        private readonly Persistence.GameDbContext _db;
 
-        public PartiesController(PartieService service) { _service = service; }
+        public PartiesController(PartieService service, Persistence.GameDbContext db) 
+        { 
+            _service = service;
+            _db = db;
+        }
 
         /// <summary>
         /// Démarre une nouvelle partie.
@@ -18,7 +25,26 @@ namespace BlazorGame.GameService.Controllers
         [HttpPost]
         public async Task<ActionResult<Partie>> Demarrer([FromBody] StartPartieRequest request, CancellationToken ct)
         {
-            var p = await _service.DemarrerAsync(request.JoueurId, request.DonjonId, ct);
+            // Récupérer le pseudo depuis le JWT
+            var username = User.Identity?.Name ?? User.FindFirst("preferred_username")?.Value ?? "testuser";
+            
+            Console.WriteLine($"Username from JWT: {username}");
+
+            // Trouver ou créer le joueur avec ce pseudo
+            var joueur = await _db.Joueurs.FirstOrDefaultAsync(j => j.Pseudo == username, ct);
+            if (joueur == null)
+            {
+                joueur = new SharedModels.Domain.Users.Joueur
+                {
+                    Id = Guid.NewGuid(),
+                    Pseudo = username,
+                    Actif = true
+                };
+                await _db.Joueurs.AddAsync(joueur, ct);
+                await _db.SaveChangesAsync(ct);
+            }
+
+            var p = await _service.DemarrerAsync(joueur.Id, request.DonjonId, ct);
             return p is null ? Conflict("Partie déjà existante pour ce donjon.") : Ok(p);
         }
 
