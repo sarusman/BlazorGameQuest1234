@@ -25,7 +25,7 @@ builder.Services.AddScoped<PartieService>();
 
 builder.Services.AddCors(o =>
     o.AddPolicy("AllowBlazorClient", p =>
-        p.WithOrigins("https://localhost:5003", "http://localhost:5003")
+        p.WithOrigins("https://localhost:5000", "http://localhost:5000")
          .AllowAnyHeader()
          .AllowAnyMethod()
          .AllowCredentials()
@@ -42,10 +42,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = false, // Désactiver car l'issuer du token est localhost:8180 mais le service utilise keycloak:8080
+            ValidateIssuer = false,
             ValidateAudience = false,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
+            ValidateLifetime = false,
+            ValidateIssuerSigningKey = false,
+            RequireSignedTokens = false, 
             NameClaimType = "preferred_username",
             RoleClaimType = "realm_access.roles"
         };
@@ -53,17 +54,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             OnAuthenticationFailed = context =>
             {
-                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
                 return Task.CompletedTask;
             },
             OnTokenValidated = context =>
             {
-                Console.WriteLine("Token validated successfully");
                 return Task.CompletedTask;
             },
             OnChallenge = context =>
             {
-                Console.WriteLine($"OnChallenge error: {context.Error}, {context.ErrorDescription}");
+                return Task.CompletedTask;
+            },
+            OnMessageReceived = context =>
+            {
+                var authHeader = context.Request.Headers["Authorization"].ToString();
                 return Task.CompletedTask;
             }
         };

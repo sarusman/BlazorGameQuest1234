@@ -39,7 +39,7 @@ Sarusman SATKUNARAJAH
 - DEVELOPPEMENT (branche develop): https://blazorgamequest1234-uat.onrender.com 
 
 ## VERSION EN LOCAL : 
-- UI (Gateway) : http://localhost:5003
+- UI (Gateway) : http://localhost:5000
 - Backend swagger (Serveur) : http://localhost:8080/swagger/index.html
 
 (Même IHM)

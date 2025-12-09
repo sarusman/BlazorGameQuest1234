@@ -25,10 +25,38 @@ namespace BlazorGame.GameService.Controllers
         [HttpPost]
         public async Task<ActionResult<Partie>> Demarrer([FromBody] StartPartieRequest request, CancellationToken ct)
         {
-            // Récupérer le pseudo depuis le JWT
-            var username = User.Identity?.Name ?? User.FindFirst("preferred_username")?.Value ?? "testuser";
-            
-            Console.WriteLine($"Username from JWT: {username}");
+            // Récupérer le token JWT directement depuis les headers
+            var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+            string? username = null;
+
+            if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    var token = authHeader.Substring("Bearer ".Length).Trim();
+                    var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+                    var jwtToken = handler.ReadJwtToken(token);
+
+                    username = jwtToken.Claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value
+                        ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "name")?.Value
+                        ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "sub")?.Value
+                        ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "email")?.Value?.Split('@')[0];
+
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+            else
+            {
+            }
+
+            // Fallback si aucun username trouvé
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                username = "anonymous";
+            }
+
 
             // Trouver ou créer le joueur avec ce pseudo
             var joueur = await _db.Joueurs.FirstOrDefaultAsync(j => j.Pseudo == username, ct);
