@@ -112,7 +112,7 @@ Lancer manuellement :
 ```sh
 dotnet test --settings BlazorGame.Tests/coverlet.runsettings
 ```
-Coverage :
+### Coverage 93% pour Gameservice:
 <img width="1300" height="496" alt="Capture d’écran 2025-12-09 à 21 26 05" src="https://github.com/user-attachments/assets/eafffd58-0e39-4379-8ea6-b6585fa6b32d" />
 
 
