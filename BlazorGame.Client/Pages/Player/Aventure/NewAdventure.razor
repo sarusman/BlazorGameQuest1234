@@ -1,3 +1,4 @@
+@attribute [Authorize]
 @page "/new-adventure"
 
 <link rel="stylesheet" href="css/adventure.css">
@@ -33,15 +34,22 @@
 
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthProvider
 
 @code {
     private string pseudo = "";
     protected override async Task OnInitializedAsync()
     {
-        pseudo = await JS.InvokeAsync<string>("eval", "document.cookie.split('; ').find(row => row.startsWith('pseudo='))?.split('=')[1] || ''");
-        if (string.IsNullOrWhiteSpace(pseudo) || pseudo == "admin1234")
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        
+        if (!user.Identity?.IsAuthenticated ?? true)
         {
-            Navigation.NavigateTo("/connexion", true);
+            Navigation.NavigateTo("/login", true);
+        }
+        else
+        {
+            pseudo = user.Identity?.Name ?? "";
         }
     }
     private void StartLevel(int level) => Navigation.NavigateTo($"/donjonGenerator?level={level}");

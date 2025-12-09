@@ -1,8 +1,17 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-<RouteView RouteData="@routeData" />
-      </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-    </NotFound>
-</Router>
+﻿<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(BlazorGame.Client.Layout.MainLayout)">
+                <NotAuthorized>
+                    <h3>Accès refusé</h3>
+                    <p>Vous devez être connecté pour accéder à cette page.</p>
+                    <a href="/login">Se connecter</a>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <p>Page introuvable.</p>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

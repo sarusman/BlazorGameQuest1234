@@ -8,6 +8,9 @@
             <ModulePath>.*SharedModels.*</ModulePath>
             <ModulePath>.*BlazorGame.Client.*</ModulePath>
           </Exclude>
+          <ExcludeByFile>
+            <File>**/Program.cs</File>
+          </ExcludeByFile>
         </Configuration>
       </DataCollector>
     </DataCollectors>
