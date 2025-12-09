@@ -12,6 +12,11 @@ namespace BlazorGame.Tests.ClientTests.NewAdventureTests
         public NewAdventureTests()
         {
             this.JSInterop.Setup<string>("eval", _ => true).SetResult("testpseudo");
+            // Ajoute l'authorization et un utilisateur authentifié
+            this.Services.AddAuthorization();
+            this.Services.AddSingleton<Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider>(
+                new TestAuthenticationStateProvider("testuser")
+            );
         }
         [Fact]
         public void RendersLevelButtons()

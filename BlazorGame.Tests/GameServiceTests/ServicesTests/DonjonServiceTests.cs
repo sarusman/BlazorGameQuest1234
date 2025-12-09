@@ -288,5 +288,28 @@ namespace BlazorGame.Tests.ServicesTests
             Assert.Equal(7, d.NbMaxSalles);
             Assert.Equal(7, d.Salles.Count);
         }
+
+        [Fact]
+        public async Task CreateAsync_UsesDefaultForInvalidDifficulty()
+        {
+            // Summary: Vérifie que CreateAsync utilise 3 salles pour une difficulté invalide (cas par défaut).
+
+            // Arrange
+            var opts = new DbContextOptionsBuilder<GameDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            await using var db = new GameDbContext(opts);
+            var repo = new Repository<Donjon>(db);
+            var salleSvc = new SalleService();
+            var svc = new DonjonService(repo, salleSvc, db);
+
+            // Act - Utilise une valeur non définie dans l'enum (cast explicite)
+            var d = await svc.CreateAsync("Test", (Difficulte)999, 0, 1, CancellationToken.None);
+
+            // Assert - Le switch devrait renvoyer 3 (cas par défaut)
+            Assert.Equal(3, d.NbMaxSalles);
+            Assert.Equal(3, d.Salles.Count);
+        }
     }
 }
