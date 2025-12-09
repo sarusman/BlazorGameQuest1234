@@ -107,6 +107,15 @@ Sarusman SATKUNARAJAH
 
 
 ## Tests
+Automatiquement exécuté dans le CI : https://github.com/sarusman/BlazorGameQuest1234/actions
+Lancer manuellement :
+```sh
+dotnet test --settings BlazorGame.Tests/coverlet.runsettings
+```
+Coverage :
+<img width="1300" height="496" alt="Capture d’écran 2025-12-09 à 21 26 05" src="https://github.com/user-attachments/assets/eafffd58-0e39-4379-8ea6-b6585fa6b32d" />
+
+
 ## Exemples de requêtes Postman
 
 Voici quelques exemples de requêtes à utiliser dans Postman pour tester l'API :
@@ -181,11 +190,6 @@ Headers:
 GET http://localhost:8080/api/scores/history
 Headers:
   Authorization: Bearer {access_token}
-```
-Automatiquement exécuté dans le CI : https://github.com/sarusman/BlazorGameQuest1234/actions
-Lancer manuellement :
-```sh
-dotnet test --settings BlazorGame.Tests/coverlet.runsettings
 ```
 
 
