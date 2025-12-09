@@ -45,8 +45,9 @@ Sarusman SATKUNARAJAH
 - UI (Gateway) : http://localhost:5003
 - Backend swagger (Serveur) : http://localhost:8080/swagger/index.html
 
-(Même IHM)
-<img width="1600" height="1243" alt="hLZDRjj64BxhAHRA8R9XMxOJfqxX6gKeob6YlufoWYBEOIMkPJhKhhfSsb427me41GeKRT6aADgBUsgYOs_jfHUzILwWVeJExbBIIgJi01LjsDHmvfl_cQK-3mNc8ke56U6BWA2hov___lUl7z3gQY70Bna_m3s2rb4fY5uWxpRkzqc0SXNI4H4dA8z6ttQuB-zNLbSpcV2vJ_kOunvguyxpBcSHzM" src="https://github.com/user-attachments/assets/cc60276c-d95c-4d55-8752-a0af412e07d8" />
+(Nouvelle IHM)
+<img width="886" height="764" alt="Capture d’écran 2025-12-09 à 20 44 45" src="https://github.com/user-attachments/assets/49a6e837-ce3a-416c-99d2-10f582bef9cb" />
+
 
 ## Fonctionnement de la version 4 :
 
