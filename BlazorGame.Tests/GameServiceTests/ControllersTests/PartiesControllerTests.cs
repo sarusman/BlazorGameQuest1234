@@ -38,9 +38,18 @@ namespace BlazorGame.Tests.ControllersTests
             await db.SaveChangesAsync(CancellationToken.None);
 
             var svc = new PartieService(db);
-            var ctrl = new PartiesController(svc);
+            var ctrl = new PartiesController(svc, db);
+            // Simule un utilisateur authentifié (testuser)
+            ctrl.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext {
+                HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext {
+                    User = new System.Security.Claims.ClaimsPrincipal(
+                        new System.Security.Claims.ClaimsIdentity(new[] {
+                            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "testuser")
+                        }, "mock"))
+                }
+            };
 
-            var start = new StartPartieRequest { JoueurId = Guid.NewGuid(), DonjonId = donjon.Id };
+            var start = new StartPartieRequest { DonjonId = donjon.Id };
 
             // Act - Demarrer
             var res = await ctrl.Demarrer(start, CancellationToken.None);
@@ -68,7 +77,15 @@ namespace BlazorGame.Tests.ControllersTests
 
             await using var db = new GameDbContext(opts);
             var svc = new PartieService(db);
-            var ctrl = new PartiesController(svc);
+            var ctrl = new PartiesController(svc, db);
+            ctrl.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext {
+                HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext {
+                    User = new System.Security.Claims.ClaimsPrincipal(
+                        new System.Security.Claims.ClaimsIdentity(new[] {
+                            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "testuser")
+                        }, "mock"))
+                }
+            };
 
             // Act
             var req = new ChoisirRequest { SalleId = Guid.NewGuid(), ChoixId = Guid.NewGuid() };
@@ -98,9 +115,16 @@ namespace BlazorGame.Tests.ControllersTests
             await db.SaveChangesAsync(CancellationToken.None);
 
             var svc = new PartieService(db);
-            var ctrl = new PartiesController(svc);
-            var joueurId = Guid.NewGuid();
-            var start = new StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
+            var ctrl = new PartiesController(svc, db);
+            ctrl.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext {
+                HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext {
+                    User = new System.Security.Claims.ClaimsPrincipal(
+                        new System.Security.Claims.ClaimsIdentity(new[] {
+                            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "testuser")
+                        }, "mock"))
+                }
+            };
+            var start = new StartPartieRequest { DonjonId = donjon.Id };
 
             // Act
             var res = await ctrl.Demarrer(start, CancellationToken.None);
@@ -108,7 +132,7 @@ namespace BlazorGame.Tests.ControllersTests
             // Assert
             var ok = Assert.IsType<OkObjectResult>(res.Result);
             var partie = Assert.IsType<Partie>(ok.Value);
-            Assert.Equal(joueurId, partie.JoueurId);
+            // JoueurId n'est plus dans StartPartieRequest, assertion supprimée
             Assert.Equal(donjon.Id, partie.DonjonId);
             Assert.Equal(10, partie.ScoreFinal);
             Assert.False(partie.EstTerminee);
@@ -131,9 +155,16 @@ namespace BlazorGame.Tests.ControllersTests
             await db.SaveChangesAsync(CancellationToken.None);
 
             var svc = new PartieService(db);
-            var ctrl = new PartiesController(svc);
-            var joueurId = Guid.NewGuid();
-            var start = new StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
+            var ctrl = new PartiesController(svc, db);
+            ctrl.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext {
+                HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext {
+                    User = new System.Security.Claims.ClaimsPrincipal(
+                        new System.Security.Claims.ClaimsIdentity(new[] {
+                            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "testuser")
+                        }, "mock"))
+                }
+            };
+            var start = new StartPartieRequest { DonjonId = donjon.Id };
 
             // Act - première création
             await ctrl.Demarrer(start, CancellationToken.None);
@@ -166,9 +197,16 @@ namespace BlazorGame.Tests.ControllersTests
             await db.SaveChangesAsync(CancellationToken.None);
 
             var svc = new PartieService(db);
-            var ctrl = new PartiesController(svc);
-            var joueurId = Guid.NewGuid();
-            var start = new StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
+            var ctrl = new PartiesController(svc, db);
+            ctrl.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext {
+                HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext {
+                    User = new System.Security.Claims.ClaimsPrincipal(
+                        new System.Security.Claims.ClaimsIdentity(new[] {
+                            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "testuser")
+                        }, "mock"))
+                }
+            };
+            var start = new StartPartieRequest { DonjonId = donjon.Id };
             var startRes = await ctrl.Demarrer(start, CancellationToken.None);
             var partie = Assert.IsType<Partie>(((OkObjectResult)startRes.Result!).Value);
 
@@ -205,9 +243,16 @@ namespace BlazorGame.Tests.ControllersTests
             await db.SaveChangesAsync(CancellationToken.None);
 
             var svc = new PartieService(db);
-            var ctrl = new PartiesController(svc);
-            var joueurId = Guid.NewGuid();
-            var start = new StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
+            var ctrl = new PartiesController(svc, db);
+            ctrl.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext {
+                HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext {
+                    User = new System.Security.Claims.ClaimsPrincipal(
+                        new System.Security.Claims.ClaimsIdentity(new[] {
+                            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "testuser")
+                        }, "mock"))
+                }
+            };
+            var start = new StartPartieRequest { DonjonId = donjon.Id };
             var startRes = await ctrl.Demarrer(start, CancellationToken.None);
             var partie = Assert.IsType<Partie>(((OkObjectResult)startRes.Result!).Value);
 
@@ -243,9 +288,16 @@ namespace BlazorGame.Tests.ControllersTests
             await db.SaveChangesAsync(CancellationToken.None);
 
             var svc = new PartieService(db);
-            var ctrl = new PartiesController(svc);
-            var joueurId = Guid.NewGuid();
-            var start = new StartPartieRequest { JoueurId = joueurId, DonjonId = donjon.Id };
+            var ctrl = new PartiesController(svc, db);
+            ctrl.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext {
+                HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext {
+                    User = new System.Security.Claims.ClaimsPrincipal(
+                        new System.Security.Claims.ClaimsIdentity(new[] {
+                            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "testuser")
+                        }, "mock"))
+                }
+            };
+            var start = new StartPartieRequest { DonjonId = donjon.Id };
             var startRes = await ctrl.Demarrer(start, CancellationToken.None);
             var partie = Assert.IsType<Partie>(((OkObjectResult)startRes.Result!).Value);
 
