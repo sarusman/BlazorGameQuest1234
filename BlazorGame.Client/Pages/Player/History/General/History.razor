@@ -1,6 +1,8 @@
+@attribute [Authorize]
 @page "/history"
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthProvider
 @using SharedModels.Domain.Scores;
 
 <link rel="stylesheet" href="css/history.css">
@@ -65,7 +67,18 @@
         loading = true;
         try
         {
+            var authState = await AuthProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            var pseudo = user?.Identity?.Name ?? user?.FindFirst("preferred_username")?.Value ?? "";
+            Console.WriteLine($"History: pseudo={pseudo}");
+            
+            var pseudoNorm = (pseudo ?? "").Trim().ToLowerInvariant();
+            Console.WriteLine($"History: pseudoNorm={pseudoNorm}");
+            
             var history = await Http.GetFromJsonAsync<List<HistoryRow>>("/api/scores/history-full") ?? new();
+            Console.WriteLine($"History: received {history.Count} items");
+            
+            // History: Afficher TOUS les scores de TOUS les utilisateurs
             items = history
                 .OrderByDescending(s => s.Date)
                 .Select(s => new Row(
@@ -76,10 +89,12 @@
                     s.Inventaire
                 ))
                 .ToList();
+            Console.WriteLine($"History: showing all {items.Count} items (from all users)");
         }
         catch (Exception ex)
         {
             error = $"Erreur: {ex.Message}";
+            Console.WriteLine($"History ERROR: {ex}");
         }
         finally { loading = false; }
     }

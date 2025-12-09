@@ -2,6 +2,8 @@ using BlazorGame.GameService.Persistence;
 using BlazorGame.GameService.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +31,45 @@ builder.Services.AddCors(o =>
          .AllowCredentials()
     )
 );
+
+// Configure JWT Authentication with Keycloak
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "http://keycloak:8080/realms/blazorgame";
+        options.MetadataAddress = "http://keycloak:8080/realms/blazorgame/.well-known/openid-configuration";
+        options.Audience = "account";
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false, // Désactiver car l'issuer du token est localhost:8180 mais le service utilise keycloak:8080
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            NameClaimType = "preferred_username",
+            RoleClaimType = "realm_access.roles"
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine("Token validated successfully");
+                return Task.CompletedTask;
+            },
+            OnChallenge = context =>
+            {
+                Console.WriteLine($"OnChallenge error: {context.Error}, {context.ErrorDescription}");
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -91,6 +132,9 @@ using (var scope = app.Services.CreateScope())
 }
 app.UseStaticFiles();
 app.UseCors("AllowBlazorClient");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {

@@ -17,9 +17,18 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<ITokenService, LocalStorageTokenService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 
+// Configurer le DelegatingHandler pour ajouter le token JWT automatiquement
+builder.Services.AddScoped<AuthorizationMessageHandler>();
+
 builder.Services.AddScoped(sp =>
-    new HttpClient
+{
+    var handler = sp.GetRequiredService<AuthorizationMessageHandler>();
+    handler.InnerHandler = new HttpClientHandler();
+    
+    return new HttpClient(handler)
     {
         BaseAddress = new Uri("http://localhost:5001")
-    });
+    };
+});
+
 await builder.Build().RunAsync();
