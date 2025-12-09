@@ -57,11 +57,17 @@ services:
       - KC_HTTP_ENABLED=true
       - KC_HOSTNAME_STRICT_HTTPS=false
       - KC_HEALTH_ENABLED=true
+    command:
+      - start-dev
+      - --import-realm
     volumes:
-      - keycloak-data:/opt/keycloak/data
-    command: ["start-dev"]
+      # Monte le fichier realm-export.json dans le dossier d’import de Keycloak
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
+      # Pour la PERSISTANCE, on garde ce volume :
+      #- keycloak-data:/opt/keycloak/data
     networks:
       - appnet
+
 
   api-gateway:
     build: 
@@ -72,16 +78,6 @@ services:
       - "5001:5001" #port d'écoute l'hote et port du conteneur
     depends_on:
       - gameservice
-    networks:
-      - appnet
-
-  keycloak-auth-service:
-    build:
-      context: .
-      dockerfile: KeycloakAuthService/Dockerfile
-    container_name: keycloak_auth_service_blazor
-    ports:
-      - "5007:5007" #port d'écoute l'hote et port du conteneur
     networks:
       - appnet
   
